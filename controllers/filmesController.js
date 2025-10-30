@@ -5,13 +5,34 @@ const { sequelize, Sequelize } = require(
 const Filme = require("../models/filmes")(sequelize, Sequelize.DataTypes);
 const Genero = require("../models/generos");
 
+// token
+const jwt = require('jsonwebtoken');
+
+const SECRET = 'APIbilheteria';
 
 // ======= Adicionar filmes ao catálogo (ADMIN) =======
 
 exports.adicionarFilme = async (req, res) => {
   console.log(req.body);
+  // adicionando verificação do token
+  const authHeader = req.headers.authorization;
 
   try {
+    const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
+
+
+    const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
+      if (err) {
+        console.log(err);
+        return res.status(403).json({ erro: 'token inválido ou expirado' });
+      }
+
+      console.log(decoded);
+      return decoded;
+    });
+
+    console.log('gestor:', autenticado);
+
     // Agora inclui o campo 'idioma'
     let { titulo, idGenero, duracao, sinopse, capa, idioma } = req.body;
 
@@ -68,7 +89,24 @@ exports.adicionarFilme = async (req, res) => {
 // ======= Listar todos os filmes (TODOS) =======
 
 exports.listarFilmes = async (req, res) => {
+  const authHeader = req.headers.authorization;
+
   try {
+    const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
+
+
+    const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
+      if (err) {
+        console.log(err);
+        return res.status(403).json({ erro: 'token inválido ou expirado' });
+      }
+
+      console.log(decoded);
+      return decoded;
+    });
+    console.log('gestor:', autenticado);
+
+
     const filmes = await Filme.findAll({
       include: [{ model: Genero, attributes: ["nome"] }]
     });
@@ -76,14 +114,29 @@ exports.listarFilmes = async (req, res) => {
   } catch (error) {
     console.error("Erro ao listar filmes:", error);
     res.status(500).send("Erro ao listar os filmes.");
-  }    
-};   
+  }
+};
 // ======= Selecionar filmes por idioma (CLIENTE) =======
 
 exports.selecionarIdioma = async (req, res) => {
   const { idioma } = req.params;
+  const authHeader = req.headers.authorization;
 
   try {
+    const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
+
+
+    const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
+      if (err) {
+        console.log(err);
+        return res.status(403).json({ erro: 'token inválido ou expirado' });
+      }
+
+      console.log(decoded);
+      return decoded;
+    });
+    console.log('gestor:', autenticado);
+
     // Validação do idioma
     if (idioma != 0 && idioma != 1) {
       return res.status(400).send("O idioma deve ser 0 (Legendado) ou 1 (Dublado).");
@@ -111,8 +164,23 @@ exports.selecionarIdioma = async (req, res) => {
 
 exports.buscarFilme = async (req, res) => {
   const titulo = req.params.titulo;
+  const authHeader = req.headers.authorization;
 
   try {
+    const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
+
+
+    const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
+      if (err) {
+        console.log(err);
+        return res.status(403).json({ erro: 'token inválido ou expirado' });
+      }
+
+      console.log(decoded);
+      return decoded;
+    });
+    console.log('gestor:', autenticado);
+
     const filme = await Filme.findOne({
       where: { titulo },
       include: [Genero],
@@ -133,8 +201,23 @@ exports.buscarFilme = async (req, res) => {
 
 exports.listargenerosFilmes = async (req, res) => {
   const { id_genero } = req.params;
+  const authHeader = req.headers.authorization;
 
   try {
+    const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
+
+
+    const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
+      if (err) {
+        console.log(err);
+        return res.status(403).json({ erro: 'token inválido ou expirado' });
+      }
+
+      console.log(decoded);
+      return decoded;
+    });
+    console.log('gestor:', autenticado);
+
     const filmes = await Filme.findAll({
       where: { id_genero },
       include: [{ model: Genero, attributes: ["nome"] }]
@@ -156,8 +239,23 @@ exports.listargenerosFilmes = async (req, res) => {
 exports.atualizarFilme = async (req, res) => {
   const { id } = req.params;
   const { titulo, id_genero, classificacao, duracao, sinopse, capa, idioma } = req.body;
+  const authHeader = req.headers.authorization;
 
   try {
+    const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
+
+
+    const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
+      if (err) {
+        console.log(err);
+        return res.status(403).json({ erro: 'token inválido ou expirado' });
+      }
+
+      console.log(decoded);
+      return decoded;
+    });
+    console.log('gestor:', autenticado);
+
     const filme = await Filme.findByPk(id);
     if (!filme) {
       return res.status(404).send("Filme não encontrado.");
@@ -189,8 +287,23 @@ exports.atualizarFilme = async (req, res) => {
 
 exports.deletarFilme = async (req, res) => {
   const { id } = req.params;
+  const authHeader = req.headers.authorization;
 
   try {
+    const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
+
+
+    const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
+      if (err) {
+        console.log(err);
+        return res.status(403).json({ erro: 'token inválido ou expirado' });
+      }
+
+      console.log(decoded);
+      return decoded;
+    });
+    console.log('gestor:', autenticado);
+
     const filme = await Filme.findByPk(id);
 
     if (!filme) {
