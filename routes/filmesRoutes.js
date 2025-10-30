@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const filmesController = require("../../controllers/filmesController");
+const filmesController = require("../controllers/filmesController");
 
 // chamando a verificação do token
-const { autenticarToken } = require("../../service/token");
+const { autenticarToken } = require("../service/token");
 
 // adicionar filme ao catalogo **ADMIN** //
 

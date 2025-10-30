@@ -1,7 +1,6 @@
 
 
-const { sequelize, Sequelize } = require(
-  "../models/db");
+const { sequelize, Sequelize } = require("../models/db");
 const Filme = require("../models/filmes")(sequelize, Sequelize.DataTypes);
 const Genero = require("../models/generos");
 
@@ -160,7 +159,7 @@ exports.selecionarIdioma = async (req, res) => {
   }
 };
 
-// ======= Buscar filme por título =======
+// ======= Buscar filme por título (TODOS) =======
 
 exports.buscarFilme = async (req, res) => {
   const titulo = req.params.titulo;
@@ -197,7 +196,7 @@ exports.buscarFilme = async (req, res) => {
   }
 };
 
-// ======= Listar filmes por gênero =======
+// ======= Listar filmes por gênero (TODOS) =======
 
 exports.listargenerosFilmes = async (req, res) => {
   const { id_genero } = req.params;
