@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const generoController = require("../../controllers/generoController");
+const generoController = require("../controllers/generoController");
 
 
 router.post("/adicionarGenero", generoController.adicionarGenero);
