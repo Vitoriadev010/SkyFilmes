@@ -5,7 +5,7 @@ const { sequelize, Sequelize } = require(
 const Filme = require("../models/filmes")(sequelize, Sequelize.DataTypes);
 const Genero = require("../models/generos");
 
-// oooo
+
 // ======= Adicionar filmes ao catálogo (ADMIN) =======
 
 exports.adicionarFilme = async (req, res) => {
