@@ -7,11 +7,6 @@ const GeneroRoutes = require("./routes/generoRoutes");
 
 
 
-
-
-
-
-
 app.use(express.json());
 app.use(FilmesRoutes);
 app.use(GeneroRoutes);
