@@ -69,3 +69,44 @@ exports.atualizarTipoSala = async (req, res) => {
       .json({ error: "Erro ao atualizar tipo de sala." });
   }
 };
+
+
+// ======== Deletar tipo de sala (ADMIN =======
+
+exports.deletarTipoSala = async (req,res) => {
+ const { id } = req.params;
+  const authHeader = req.headers.authorization;
+
+  try {
+    const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
+
+
+    const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
+      if (err) {
+        console.log(err);
+        return res.status(403).json({ erro: 'token inválido ou expirado' });
+      }
+
+      console.log(decoded);
+      return decoded;
+    });
+    console.log('gestor:', autenticado);
+
+    const salasTipo = await salasController.findByPk(id);
+
+    if (!salasTipo) {
+      return res.status(404).send("Tipo de sala não encontrado.");
+    }
+
+    await salasTipo.destroy();
+
+    return res.status(200).json({
+      message: "tipo de sala deletado com sucesso!",
+      tipoDeSala: salasTipo
+    });
+
+  } catch (error) {
+    console.error("Erro ao deletar tipo de sala:", error);
+    return res.status(500).send("Erro ao deletar o tipo de sala.");
+  }
+};
