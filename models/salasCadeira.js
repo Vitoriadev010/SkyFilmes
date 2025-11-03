@@ -22,6 +22,11 @@ module.exports = function(sequelize, DataTypes) {
     coluna: {
       type: DataTypes.INTEGER,
       allowNull: false
+    },
+    status: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 1
     }
   }, {
     sequelize,

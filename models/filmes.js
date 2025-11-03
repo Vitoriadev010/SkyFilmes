@@ -1,3 +1,4 @@
+const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('filmes', {
     idFilme: {
@@ -33,6 +34,11 @@ module.exports = function(sequelize, DataTypes) {
     idioma: {
       type: DataTypes.STRING(1),
       allowNull: false
+    },
+    status: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 1
     }
   }, {
     sequelize,

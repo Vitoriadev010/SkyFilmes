@@ -30,6 +30,11 @@ module.exports = function(sequelize, DataTypes) {
     hora: {
       type: DataTypes.TIME,
       allowNull: false
+    },
+    status: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 1
     }
   }, {
     sequelize,

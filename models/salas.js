@@ -26,6 +26,11 @@ module.exports = function(sequelize, DataTypes) {
     numero: {
       type: DataTypes.INTEGER,
       allowNull: false
+    },
+    status: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 1
     }
   }, {
     sequelize,

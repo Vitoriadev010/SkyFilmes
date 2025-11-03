@@ -12,7 +12,7 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false
     },
     cpf: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING(11),
       allowNull: false
     },
     email: {
@@ -26,6 +26,11 @@ module.exports = function(sequelize, DataTypes) {
     codigoEmpresarial: {
       type: DataTypes.STRING(7),
       allowNull: false
+    },
+    status: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 1
     }
   }, {
     sequelize,

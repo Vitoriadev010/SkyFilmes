@@ -14,6 +14,11 @@ module.exports = function(sequelize, DataTypes) {
     valor: {
       type: DataTypes.DECIMAL(50,0),
       allowNull: false
+    },
+    status: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 1
     }
   }, {
     sequelize,
