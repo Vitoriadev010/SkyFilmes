@@ -1,6 +1,6 @@
 const { sequelize, Sequelize } = require("../models/db");
 
-const salas = require("../models/salas/salas")(sequelize, Sequelize.DataTypes);
+const salas = require("../models/salas")(sequelize, Sequelize.DataTypes);
 
 // ======== Adicionar sala (ADMIN) =========
 
@@ -166,4 +166,47 @@ exports.atualizarSala = async (req, res) => {
     console.error("erro ao atualizar a sala", error);
     return res.status(500).json({error: "erro ao atualizar a sala!"});
 }
+};
+
+
+// ======== Deletar sala (ADMIN) =========
+
+exports.deletarSala = async (req, res) => {
+
+   const { id } = req.params;
+    const authHeader = req.headers.authorization;
+  
+    try {
+      const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
+  
+  
+      const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
+        if (err) {
+          console.log(err);
+          return res.status(403).json({ erro: 'token inválido ou expirado' });
+        }
+  
+        console.log(decoded);
+        return decoded;
+      });
+      console.log('gestor:', autenticado);
+
+
+      const sala = await salas.findByPk(id);
+
+      if (!sala) {
+        return res.status(404).send("sala nao encontrada!");
+       }
+
+       await sala.destry();
+
+       return res.status(200).json({
+        message: "sala deletada com sucesso!",
+        sala: sala
+       });
+
+      }catch (error) {
+        console.error("erro ao deletar sala:", error);
+        return res.status(500).send("erro ao deletar a sala!");
+      }
 };

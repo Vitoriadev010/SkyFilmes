@@ -12,6 +12,7 @@ const SECRET = 'APIbilheteria';
 
 exports.cadastrarCliente = async (req, res) => {
     const { nomeCliente, cpfCliente, emailCliente, senhaCliente } = req.body
+    console.log(req.body);
 
     try {
         if (!nomeCliente || !cpfCliente || !emailCliente || !senhaCliente) {
@@ -32,7 +33,6 @@ exports.cadastrarCliente = async (req, res) => {
         if (clienteExistente) {
             return res.status(400).json({ erro: 'Cliente já cadastrado' });
         }
-        console.log(clienteExistente);
 
         const novoCliente = await clientes.create({
             nome: nomeCliente,

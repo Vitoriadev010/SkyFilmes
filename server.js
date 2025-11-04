@@ -1,6 +1,11 @@
+const cors = require("cors");
 const express = require("express");
+const morgan = require('morgan');
 const app = express();
 
+app.use(morgan('dev')); // 'dev' is a predefined format
+
+app.use(cors());
 
 const FilmesRoutes = require("./routes/filmesRoutes");
 const GeneroRoutes = require("./routes/generoRoutes");
@@ -17,6 +22,11 @@ app.use(adminFilmesRoutes);
 app.use(adminGeneroRoutes);
 app.use(gestorCadasLoginRoutes);
 
-app.listen(3000, () => {
+app.get('/', (req, res) => {
+  res.send('Servidor está funcionando corretamente!');
+})
+
+app.listen(3000, "0.0.0.0", () => {
   console.log('Vitoria Linda diz: Servidor rodando na porta 3000');
+  
 })
