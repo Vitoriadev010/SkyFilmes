@@ -7,23 +7,27 @@ const jwt = require('jsonwebtoken');
 const SECRET = 'APIbilheteria';
 
 exports.cadastrarGestor = async (req, res) => {
-    const { nomeGestor, cpfGestor, emailGestor, senhaGestor, codigoEmpresarial } = req.body
+    const { nome, cpf, email, senha, codigoEmpresarial } = req.body
     const codigoEmpresarialValido = 'GESTOR';
 
     try {
-        if (!nomeGestor || !cpfGestor || !emailGestor || !senhaGestor || !codigoEmpresarial) {
+        if (!nome || !cpf || !email || !senha || !codigoEmpresarial) {
             return res.status(400).json({ erro: 'Todos os campos são obrigatórios' });
         }
 
-        if (!/^\d{11}$/.test(cpfGestor)) {
+        if (!/^\d{11}$/.test(cpf)) {
             return res.status(400).json({ erro: "CPF inválido. Deve ter 11 números." });
+        }
+
+        if (codigoEmpresarial !== codigoEmpresarialValido) {
+            return res.status(403).json({ erro: 'Código empresarial inválido' });
         }
 
 
         const gestorExistente = await gestores.findOne({
             where: {
-                email: emailGestor,
-                cpf: cpfGestor
+                email: email,
+                cpf: cpf
             }
         });
 
@@ -33,16 +37,14 @@ exports.cadastrarGestor = async (req, res) => {
         console.log(gestorExistente);
 
         const novoGestor = await gestores.create({
-            nome: nomeGestor,
-            cpf: cpfGestor,
-            email: emailGestor,
-            senha: senhaGestor,
+            nome: nome,
+            cpf: cpf,
+            email: email,
+            senha: senha,
             codigoEmpresarial: codigoEmpresarial
         })
 
-        if (codigoEmpresarial !== codigoEmpresarialValido) {
-            return res.status(403).json({ erro: 'Código empresarial inválido' });
-        }
+
         res.status(201).json({
             mensagem: 'Gestor registrado com sucesso',
             gestor: novoGestor
