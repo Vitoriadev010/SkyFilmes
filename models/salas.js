@@ -7,14 +7,6 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       primaryKey: true
     },
-    idFilme: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'filmes',
-        key: 'idFilme'
-      }
-    },
     idSalasTipo: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -43,13 +35,6 @@ module.exports = function(sequelize, DataTypes) {
         using: "BTREE",
         fields: [
           { name: "ideSala" },
-        ]
-      },
-      {
-        name: "idFilme",
-        using: "BTREE",
-        fields: [
-          { name: "idFilme" },
         ]
       },
       {

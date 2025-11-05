@@ -24,8 +24,6 @@ function initModels(sequelize) {
 
   vendas.belongsTo(clientes, { as: "idCliente_cliente", foreignKey: "idCliente"});
   clientes.hasMany(vendas, { as: "vendas", foreignKey: "idCliente"});
-  salas.belongsTo(filmes, { as: "idFilme_filme", foreignKey: "idFilme"});
-  filmes.hasMany(salas, { as: "salas", foreignKey: "idFilme"});
   sessoes.belongsTo(filmes, { as: "idFilme_filme", foreignKey: "idFilme"});
   filmes.hasMany(sessoes, { as: "sessos", foreignKey: "idFilme"});
   filmes.belongsTo(generos, { as: "idGenero_genero", foreignKey: "idGenero"});

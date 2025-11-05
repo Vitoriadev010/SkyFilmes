@@ -1,17 +1,21 @@
 const { where } = require("sequelize");
 const { Op } = require("sequelize");
 const { sequelize, Sequelize } = require("../models/db");
-const sessoes = require("../models/sessoes")(sequelize, Sequelize.DataTypes);
-const filmes = require("../models/filmes")(sequelize, Sequelize.DataTypes);
-const salas = require("../models/salas")(sequelize, Sequelize.DataTypes);
+
+const initModels = require('../models/init-models');
+const models = initModels(sequelize, Sequelize.DataTypes);
+
+// const sessoes = require("../models/sessoes")(sequelize, Sequelize.DataTypes);
+// const filmes = require("../models/filmes")(sequelize, Sequelize.DataTypes);
+// const salas = require("../models/salas")(sequelize, Sequelize.DataTypes);
+// const generos = require("../models/generos")(sequelize, Sequelize.DataTypes);
+// const salasTipo = require("../models/salasTipo")(sequelize, Sequelize.DataTypes);
 
 // token
 const jwt = require('jsonwebtoken');
 
 const SECRET = 'APIbilheteria';
 
-// função editar data
-const { converterDataISO } = require("../service/converterDataISO");
 
 exports.criarSessao = async (req, res) => {
     console.log('criando sessao');
@@ -34,17 +38,14 @@ exports.criarSessao = async (req, res) => {
 
         console.log('gestor:', autenticado);
 
-        // Converte data para formato ISO (YYYY-MM-DD)
-        const dataISO = converterDataISO(data);
-        if (!dataISO) return res.status(400).json({ erro: 'Data inválida' });
 
 
-        const sessaoExistente = await sessoes.findOne({
+        const sessaoExistente = await models.sessoes.findOne({
             where: {
                 idFilme: idFilme,
                 idSala: idSala,
                 hora: hora,
-                data: dataISO
+                data: data
             }
         });
 
@@ -54,22 +55,54 @@ exports.criarSessao = async (req, res) => {
 
 
 
-        const novaSessao = await sessoes.create({
+        const novaSessao = await models.sessoes.create({
             idFilme: idFilme,
             idSala: idSala,
             hora: hora,
-            data: dataISO
+            data: data
         });
 
+        if (!novaSessao) {
+            return res.status(500).json({ erro: 'Erro ao criar sessão.' });
+        }
+
+        const sessaoComTudo = await models.sessoes.findOne({
+            where: { idSessao: novaSessao.idSessao },
+            include: [
+                {
+                    model: models.filmes,
+                    as: 'idFilme_filme',
+                    attributes: [
+                        'titulo',
+                        'duracao',
+                        'idioma'
+                    ]
+                }
+            ]
+        });
+
+        // evitando o date para não pegar fuso
+        const [ano, mes, dia] = sessaoComTudo.data.split('-');
 
         const sessaoFormatada = {
-            ...novaSessao.toJSON(),
-            data: new Date(novaSessao.data).toLocaleDateString('pt-BR', {
-                day: '2-digit',
-                month: 'long',
-                year: 'numeric'
-            })
+            ...sessaoComTudo.toJSON(),
+            data: `${dia.padStart(2, '0')} de ${[
+                '',
+                'janeiro',
+                'fevereiro',
+                'março',
+                'abril',
+                'maio',
+                'junho',
+                'julho',
+                'agosto',
+                'setembro',
+                'outubro',
+                'novembro',
+                'dezembro'
+            ][Number(mes)]} de ${ano}`
         };
+
 
         res.status(201).json({
             mensagem: 'Sessão criada com sucesso',
