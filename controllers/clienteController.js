@@ -11,22 +11,22 @@ const SECRET = 'APIbilheteria';
 
 
 exports.cadastrarCliente = async (req, res) => {
-    const { nomeCliente, cpfCliente, emailCliente, senhaCliente } = req.body
+    const { nome, cpf, email, senha } = req.body
     console.log(req.body);
 
     try {
-        if (!nomeCliente || !cpfCliente || !emailCliente || !senhaCliente) {
+        if (!nome || !cpf || !email || !senha) {
             return res.status(400).json({ erro: 'Todos os campos são obrigatórios' });
         }
 
-        if (!/^\d{11}$/.test(cpfCliente)) {
+        if (!/^\d{11}$/.test(cpf)) {
             return res.status(400).json({ erro: "CPF inválido. Deve ter 11 números." });
         }
 
         const clienteExistente = await clientes.findOne({
             where: {
-                email: emailCliente,
-                cpf: cpfCliente
+                email: email,
+                cpf: cpf
             }
         });
 
@@ -35,10 +35,10 @@ exports.cadastrarCliente = async (req, res) => {
         }
 
         const novoCliente = await clientes.create({
-            nome: nomeCliente,
-            cpf: cpfCliente,
-            email: emailCliente,
-            senha: senhaCliente
+            nome: nome,
+            cpf: cpf,
+            email: email,
+            senha: senha
         })
 
         res.status(201).json({
