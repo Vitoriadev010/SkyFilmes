@@ -14,6 +14,10 @@ const adminGeneroRoutes = require("./routes/generoRoutes");
 const gestorCadasLoginRoutes = require("./routes/cadasLoginRoutes");
 const sessoesRoutes = require("./routes/sessoesRoutes");
 const sessoesClientRoutes = require("./routes/sessoesClientRoutes");
+const salasRoutes = require("./routes/salasRoutes");
+const salaTipoRoutes = require("./routes/salaTipoRoutes");
+const salasCadeiraRoutes = require("./routes/salasCadeiraRoutes");
+
 
 
 app.use(express.json());
@@ -24,6 +28,9 @@ app.use(adminGeneroRoutes);
 app.use(gestorCadasLoginRoutes);
 app.use(sessoesRoutes);
 app.use(sessoesClientRoutes);
+app.use(salasRoutes);
+app.use(salaTipoRoutes);
+app.use(salasCadeiraRoutes);
 
 app.get('/', (req, res) => {
   res.send('Servidor está funcionando corretamente!');
