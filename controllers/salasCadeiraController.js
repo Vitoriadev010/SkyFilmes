@@ -63,9 +63,9 @@ exports.listarCadeiras = async (req, res) => {
 
 };
 
-// ========== buscar cadeira por id (TODOS) ==========
+// ========== listar cadeira por id (TODOS) ==========
 
-exports.buscarCadeiraId = async (req, res) => {
+exports.listarCadeiraId = async (req, res) => {
     const { id} = req.params;
     try {
         const cadeira = await salasController.findByPk(id);

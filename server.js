@@ -12,6 +12,9 @@ const GeneroRoutes = require("./routes/generoRoutes");
 const adminFilmesRoutes = require("./routes/filmesRoutes");
 const adminGeneroRoutes = require("./routes/generoRoutes");
 const gestorCadasLoginRoutes = require("./routes/cadasLoginRoutes");
+const salasRoutes = require("./routes/salasRoutes");
+const salaTipoRoutes = require("./routes/salaTipoRoutes");
+const salasCadeiraRoutes = require("./routes/salasCadeiraRoutes");
 
 
 
@@ -21,6 +24,9 @@ app.use(GeneroRoutes);
 app.use(adminFilmesRoutes);
 app.use(adminGeneroRoutes);
 app.use(gestorCadasLoginRoutes);
+app.use(salasRoutes);
+app.use(salaTipoRoutes);
+app.use(salasCadeiraRoutes);
 
 app.get('/', (req, res) => {
   res.send('Servidor está funcionando corretamente!');
