@@ -12,7 +12,8 @@ const GeneroRoutes = require("./routes/generoRoutes");
 const adminFilmesRoutes = require("./routes/filmesRoutes");
 const adminGeneroRoutes = require("./routes/generoRoutes");
 const gestorCadasLoginRoutes = require("./routes/cadasLoginRoutes");
-
+const sessoesRoutes = require("./routes/sessoesRoutes");
+const sessoesClientRoutes = require("./routes/sessoesClientRoutes");
 
 
 app.use(express.json());
@@ -21,6 +22,8 @@ app.use(GeneroRoutes);
 app.use(adminFilmesRoutes);
 app.use(adminGeneroRoutes);
 app.use(gestorCadasLoginRoutes);
+app.use(sessoesRoutes);
+app.use(sessoesClientRoutes);
 
 app.get('/', (req, res) => {
   res.send('Servidor está funcionando corretamente!');
