@@ -13,6 +13,5 @@ router.post("/adicionarcadeira", autenticarToken, salasCadeiraController.adicion
 router.get("/listarcadeiras", salasCadeiraController.listarCadeiras); // todos
 router.get("/listarcadeiras/:idSala", salasCadeiraController.listarCadeiraId); // todos
 router.patch("/atualizarcadeira/:id", autenticarToken, salasCadeiraController.atualizarCadeira); // admin
-router.delete("/deletarcadeira/:id", autenticarToken, salasCadeiraController.deletarCadeira); // admin
 
 module.exports = router;

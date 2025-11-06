@@ -136,11 +136,10 @@ exports.atualizarSala = async (req, res) => {
     // ===== Pega o ID da sala =====
     const { id } = req.params;
     
-    // Seu model não usa 'idFilme'
     const { idSalasTipo, numero, status } = req.body; 
 
     // ===== Verifica se a sala existe =====
-    const sala = await models.salas.findByPk(id); // USANDO models.salas CORRETAMENTE
+    const sala = await models.salas.findByPk(id);
     if (!sala) {
       return res.status(404).send("Sala não encontrada.");
     }
@@ -153,7 +152,11 @@ exports.atualizarSala = async (req, res) => {
     }
 
     if (idSalasTipo) sala.idSalasTipo = idSalasTipo;
-    if (status !== undefined) sala.status = status; // Permite atualizar status
+    if (status !== undefined) sala.status = status;
+     
+    if (status !== undefined && ![0, 1].includes(status)) {
+      return res.status(400).send("Status inválido. Use 0 para inativo e 1 para ativo.");
+    } // em vez de deletar, apenas atualizar status
 
     // ===== Salva =====
     await sala.save();
@@ -174,44 +177,3 @@ exports.atualizarSala = async (req, res) => {
 };
 
 
-// ======== Deletar sala (ADMIN) =========
-
-exports.deletarSala = async (req, res) => {
-
-   const { id } = req.params;
-    const authHeader = req.headers.authorization;
-  
-    try {
-      const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
-  
-  
-      const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
-        if (err) {
-          console.log(err);
-          return res.status(403).json({ erro: 'token inválido ou expirado' });
-        }
-  
-        console.log(decoded);
-        return decoded;
-      });
-      console.log('gestor:', autenticado);
-
-
-      const sala = await models.salas.findByPk(id); // USANDO models.salas CORRETAMENTE
-
-      if (!sala) {
-        return res.status(404).send("sala nao encontrada!");
-       }
-
-       await sala.destroy(); // CORRIGIDO: Era 'destry'
-
-       return res.status(200).json({
-           message: "sala deletada com sucesso!",
-           sala: sala
-       });
-
-    } catch (error) {
-      console.error("erro ao deletar sala:", error);
-      return res.status(500).json({error: "erro ao deletar sala!"});
-    }
-};
