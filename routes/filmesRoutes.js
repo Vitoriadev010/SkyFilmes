@@ -3,15 +3,15 @@ const router = express.Router();
 const filmesController = require("../controllers/filmesController");
 
 // chamando a verificação do token
-const { autenticarToken } = require("../service/token");
+const { autenticarTokenGestor, autenticarTokenCliente } = require("../service/token");
 
 // adicionar filme ao catalogo **ADMIN** //
 
-router.post("/adicionarfilme", autenticarToken, filmesController.adicionarFilme); // admin
-router.patch("/:id", autenticarToken, filmesController.atualizarFilme); // admin
-router.get("/listarfilmes", autenticarToken, filmesController.listarFilmes); // todos
-router.get("/filme/:id_genero", autenticarToken, filmesController.listargenerosFilmes); // todos
-router.get("/filme/:titulo", autenticarToken, filmesController.buscarFilme); //todos
-router.get("/selecionarIdioma/:idioma", autenticarToken, filmesController.selecionarIdioma); // todos
+router.post("/adicionarfilme", autenticarTokenGestor, filmesController.adicionarFilme); // admin
+router.patch("/:id", autenticarTokenGestor, filmesController.atualizarFilme); // admin
+router.get("/listarfilmes", autenticarTokenGestor, autenticarTokenCliente, filmesController.listarFilmes); // todos
+router.get("/filme/:id_genero", autenticarTokenGestor, autenticarTokenCliente, filmesController.listargenerosFilmes); // todos
+router.get("/filme/:titulo", autenticarTokenGestor, autenticarTokenCliente, filmesController.buscarFilme); //todos
+router.get("/selecionarIdioma/:idioma", autenticarTokenGestor, autenticarTokenCliente, filmesController.selecionarIdioma); // todos
 
 module.exports = router;

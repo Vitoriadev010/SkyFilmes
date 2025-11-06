@@ -3,13 +3,13 @@ const router = express.Router();
 const salasController = require("../controllers/salasController");
 
 // chamando a verificação do token
-const { autenticarToken } = require("../service/token");
+const { autenticarTokenGestor, autenticarTokenCliente } = require("../service/token");
 
 // comandos das salas **ADMIN** //
 
-router.post("/adicionarsala", autenticarToken, salasController.adicionarSala); // admin
-router.patch("/:id", autenticarToken, salasController.atualizarSala); // admin
-router.get("/listarsalas", autenticarToken, salasController.listarSalas); // admin
-router.get("/:id", autenticarToken,salasController.ListarSalaPorID); // cliente
+router.post("/adicionarsala", autenticarTokenGestor, salasController.adicionarSala); // admin
+router.patch("/:id", autenticarTokenGestor, salasController.atualizarSala); // admin
+router.get("/listarsalas", autenticarTokenGestor, salasController.listarSalas); // admin
+router.get("/:id", autenticarTokenCliente, salasController.ListarSalaPorID); // cliente
 
 module.exports = router;

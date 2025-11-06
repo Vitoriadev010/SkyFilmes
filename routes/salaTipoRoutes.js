@@ -3,14 +3,13 @@ const router = express.Router();
 const salasTipoController = require("../controllers/salasTipoController");
 
 // verificação token  // 
-const { autenticarToken } = require("../service/token");
+const { autenticarTokenGestor, autenticarTokenCliente } = require("../service/token");
 
 
 // comandos dos tipos de sala
 
-router.post("/adicionartiposala", autenticarToken, salasTipoController.adicionarTipoSala); // admin 
-router.patch("/:id", autenticarToken, salasTipoController.atualizarTipoSala); // admin 
-router.get("/listartiposalas", autenticarToken, salasTipoController.listarTiposSalas); // todos
+router.post("/adicionartiposala", autenticarTokenGestor, salasTipoController.adicionarTipoSala); // admin 
+router.patch("/:id", autenticarTokenGestor, salasTipoController.atualizarTipoSala); // admin 
+router.get("/listartiposalas", autenticarTokenGestor, autenticarTokenCliente, salasTipoController.listarTiposSalas); // todos
 
 module.exports = router;
- 

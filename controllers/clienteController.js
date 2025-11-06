@@ -23,6 +23,15 @@ exports.cadastrarCliente = async (req, res) => {
             return res.status(400).json({ erro: "CPF inválido. Deve ter 11 números." });
         }
 
+        const emailRegex = /^[^\s@]+@[^\s@]+\.com$/i;
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({ erro: 'Email inválido: deve conter "@" e terminar com ".com"' });
+        }
+
+        if (/\s/.test(senha)) {
+            return res.status(400).json({ erro: 'A senha não pode conter espaços' });
+        }
+
         const clienteExistente = await clientes.findOne({
             where: {
                 email: email,
