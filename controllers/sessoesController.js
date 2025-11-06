@@ -49,6 +49,8 @@ exports.criarSessao = async (req, res) => {
             }
         });
 
+        console.log('sessaoExistente:', sessaoExistente);
+
         if (sessaoExistente) {
             return res.status(400).json({ erro: 'Sessão já existe para o filme, sala, hora e data informados.' });
         }
@@ -61,6 +63,7 @@ exports.criarSessao = async (req, res) => {
             hora: hora,
             data: data
         });
+        console.log('novaSessao:', novaSessao);
 
         if (!novaSessao) {
             return res.status(500).json({ erro: 'Erro ao criar sessão.' });
@@ -112,25 +115,25 @@ exports.criarSessao = async (req, res) => {
         // evitando o date para não pegar fuso
         const [ano, mes, dia] = sessaoComTudo.data.split('-');
 
+        const meses = [
+            'janeiro',
+            'fevereiro',
+            'março',
+            'abril',
+            'maio',
+            'junho',
+            'julho',
+            'agosto',
+            'setembro',
+            'outubro',
+            'novembro',
+            'dezembro'
+        ];
+
         const sessaoFormatada = {
             ...sessaoComTudo.toJSON(),
-            data: `${dia.padStart(2, '0')} de ${[
-                '',
-                'janeiro',
-                'fevereiro',
-                'março',
-                'abril',
-                'maio',
-                'junho',
-                'julho',
-                'agosto',
-                'setembro',
-                'outubro',
-                'novembro',
-                'dezembro'
-            ][Number(mes)]} de ${ano}`
+            data: `${dia.padStart(2, '0')} de ${meses[Number(mes) - 1]} de ${ano}`
         };
-
 
         res.status(201).json({
             mensagem: 'Sessão criada com sucesso',
@@ -204,7 +207,7 @@ exports.editarSessao = async (req, res) => {
 
 exports.listarSessoes = async (req, res) => {
     const authHeader = req.headers.authorization;
-    const { status } = req.body;
+    const { status } = req.query;
     // listar sessões por filtro de status, ex: ativo/inativo e ativo e inativo - fazer depois
 
     try {
@@ -223,14 +226,14 @@ exports.listarSessoes = async (req, res) => {
 
         console.log('gestor:', autenticado);
 
-        // filtro por status se fornecido no corpo da requisição
+        // filtro por status se fornecido na URL, deve chamar : /listarSessoes?status=1 / 0 / 1,0
         const where = {};
-
         if (status !== undefined) {
-            if (Array.isArray(status)) {
-                where.status = { [Op.in]: status };
+            const statusArray = String(status).split(',').map(s => Number(s));
+            if (statusArray.length > 1) {
+                where.status = { [Op.in]: statusArray };
             } else {
-                where.status = status;
+                where.status = statusArray[0];
             }
         }
         const listaSessoes = await models.sessoes.findAll({
@@ -267,7 +270,7 @@ exports.listarSessoesFuturas = async (req, res) => {
         console.log('cliente:', autenticado);
 
 
-        const listaSessoesFuturas = await sessoes.findAll({
+        const listaSessoesFuturas = await models.sessoes.findAll({
             where: {
                 status: 1,
                 [Op.and]: [

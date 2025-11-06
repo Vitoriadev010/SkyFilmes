@@ -3,10 +3,10 @@ const router = express.Router();
 const sessoesController = require("../controllers/sessoesController");
 
 // chamando a verificação do token
-const { autenticarTokenCliente } = require("../service/token");
+const { autenticarTokenCliente, autenticarTokenGestor } = require("../service/token");
 
 // rotas para sessões - cliente //
-router.get("/listarSessoesFuturas", autenticarTokenCliente, sessoesController.listarSessoesFuturas);
-router.get("/detalharSessao", autenticarTokenCliente, sessoesController.detalhesSessao);
+router.get("/listarSessoesFuturas", autenticarTokenCliente, autenticarTokenGestor, sessoesController.listarSessoesFuturas);
+router.get("/detalharSessao", autenticarTokenCliente, autenticarTokenGestor, sessoesController.detalhesSessao);
 
 module.exports = router;
