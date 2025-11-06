@@ -36,7 +36,7 @@ app.get('/', (req, res) => {
   res.send('Servidor está funcionando corretamente!');
 })
 
-app.listen(3000, "0.0.0.0", () => {
+app.listen(3001, "0.0.0.0", () => {
   console.log('Vitoria Linda diz: Servidor rodando na porta 3000');
   
 })

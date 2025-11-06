@@ -76,6 +76,34 @@ exports.criarSessao = async (req, res) => {
                         'titulo',
                         'duracao',
                         'idioma'
+                    ],
+                    include: [
+                        {
+                            model: models.generos,
+                            as: 'idGenero_genero',
+                            attributes: [
+                                'nome',
+                                'classificacao'
+                            ]
+                        }
+                    ]
+                },
+                {
+                    model: models.salas,
+                    as: 'idSala_sala',
+                    attributes: [
+                        'numero'
+                    ],
+                    include: [
+                        {
+                            model: models.salasTipo,
+                            as: 'idSalasTipo_salasTipo',
+                            attributes: [
+                                'tipo',
+                                'valor'
+                            ]
+
+                        }
                     ]
                 }
             ]
@@ -116,7 +144,7 @@ exports.criarSessao = async (req, res) => {
 
 exports.editarSessao = async (req, res) => {
     const authHeader = req.headers.authorization;
-    const { idFilme, idSala, hora, data } = req.body;
+    const { idSessao, idFilme, idSala, hora, data, status } = req.body;
 
     try {
         const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
@@ -134,24 +162,24 @@ exports.editarSessao = async (req, res) => {
 
         console.log('gestor:', autenticado);
 
-        const sessao = await sessoes.findOne({
-            where: {
-                idFilme: idFilme,
-                idSala: idSala,
-                hora: hora,
-                data: data
-            }
-        });
-        console.log(sessao);
+        // Busca a sessão pelo idSessao
+        const sessao = await models.sessoes.findByPk(idSessao);
 
         if (!sessao) {
-            return res.status(404).json({ erro: 'Sessão não encontrada para o filme, sala, hora e data informados.' });
+            return res.status(404).json({ erro: 'Sessão não encontrada para o id informado.' });
         }
 
-        sessao.hora = hora ?? sessao.hora;
-        sessao.data = data ?? sessao.data;
-        sessao.idFilme = idFilme ?? sessao.idFilme;
-        sessao.idSala = idSala ?? sessao.idSala;
+        // Atualiza somente os campos que vieram
+        if (idFilme !== undefined) sessao.idFilme = idFilme;
+        if (idSala !== undefined) sessao.idSala = idSala;
+        if (hora !== undefined) sessao.hora = hora;
+        if (data !== undefined) sessao.data = data;
+        if (status !== undefined) sessao.status = status;
+
+        if (status !== undefined && ![0, 1].includes(status)) {
+            return res.status(400).json({ erro: 'Status inválido. Use 0 para inativo ou 1 para ativo.' });
+        }
+
 
         await sessao.save();
 
@@ -159,53 +187,25 @@ exports.editarSessao = async (req, res) => {
             mensagem: 'Sessão atualizada com sucesso',
             sessao: sessao
         });
+
     } catch (error) {
         console.error('Erro ao editar sessão:', error);
-    }
-}
 
-
-exports.deletarSessao = async (req, res) => {
-    const authHeader = req.headers.authorization;
-    const { idSessao } = req.body;
-
-    try {
-        const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
-
-
-        const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
-            if (err) {
-                console.log(err);
-                return res.status(403).json({ erro: 'token inválido ou expirado' });
-            }
-
-            console.log(decoded);
-            return decoded;
-        });
-
-        console.log('gestor:', autenticado);
-
-        const sessao = await sessoes.findOne({
-            where: {
-                idSessao: idSessao
-            }
-        });
-
-        if (!sessao) {
-            return res.status(404).json({ erro: 'Sessão não encontrada para o id informado.' });
+        if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
+            return res.status(403).json({ erro: 'Token inválido ou expirado' });
         }
 
-        await sessao.destroy();
-        res.status(200).json({ mensagem: 'Sessão deletada com sucesso.' });
-    } catch (error) {
-        console.error('Erro ao deletar sessão:', error);
+        res.status(500).json({ erro: 'Erro interno no servidor' });
     }
-}
+};
+
+
 
 
 exports.listarSessoes = async (req, res) => {
     const authHeader = req.headers.authorization;
-
+    const { status } = req.body;
+    // listar sessões por filtro de status, ex: ativo/inativo e ativo e inativo - fazer depois
 
     try {
         const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
@@ -223,8 +223,19 @@ exports.listarSessoes = async (req, res) => {
 
         console.log('gestor:', autenticado);
 
-        const listaSessoes = await sessoes.findAll({
-            attributes: ['idSessao', 'idFilme', 'idSala', 'hora', 'data']
+        // filtro por status se fornecido no corpo da requisição
+        // const where = {};
+
+        if (status !== undefined) {
+            if (Array.isArray(status)) {
+                where.status = { [Op.in]: status };
+            } else {
+                where.status = status;
+            }
+        }
+        const listaSessoes = await models.sessoes.findAll({
+            attributes: ['idSessao', 'idFilme', 'idSala', 'hora', 'data', 'status'],
+            where
         });
 
         res.status(200).json(listaSessoes);
@@ -237,6 +248,7 @@ exports.listarSessoes = async (req, res) => {
 // lista sessoes futuras para clientes
 exports.listarSessoesFuturas = async (req, res) => {
     const authHeader = req.headers.authorization;
+    // listar sessões por filtro de status, apenas ativos(futuras)
 
     try {
         const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
@@ -254,7 +266,6 @@ exports.listarSessoesFuturas = async (req, res) => {
 
         console.log('cliente:', autenticado);
 
-        const agora = new Date();
 
         const listaSessoesFuturas = await sessoes.findAll({
             where: {
