@@ -96,8 +96,6 @@ exports.atualizarGenero = async (req, res) => {
 };
 
  
-
-
 // ======= apagar genero do catalogo (ADMIN) ========
 
 exports.deletarGenero = async (req,res) => {

@@ -10,6 +10,8 @@ const { autenticarToken } = require("../service/token");
 router.post("/adicionarfilme", autenticarToken, filmesController.adicionarFilme); // admin
 router.patch("/:id", autenticarToken, filmesController.atualizarFilme); // admin
 router.get("/listarfilmes", autenticarToken, filmesController.listarFilmes); // todos
+router.get("/filme/:id_genero", autenticarToken, filmesController.listargenerosFilmes); // todos
+router.get("/filme/:titulo", autenticarToken, filmesController.buscarFilme); //todos
 router.get("/selecionarIdioma/:idioma", autenticarToken, filmesController.selecionarIdioma); // todos
 
 module.exports = router;
