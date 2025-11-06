@@ -10,8 +10,8 @@ const salas = require("../models/salas");
 
 
 router.post("/adicionarcadeira", autenticarToken, salasCadeiraController.adicionarCadeira); // admin
-router.get("/listarcadeiras", salasCadeiraController.listarCadeiras); // todos
-router.get("/listarcadeiras/:idSala", salasCadeiraController.listarCadeiraId); // todos
+router.get("/listarcadeiras",autenticarToken, salasCadeiraController.listarCadeiras); // todos
+router.get("/listarcadeiras/:idSala", autenticarToken, salasCadeiraController.listarCadeiraId); // todos
 router.patch("/atualizarcadeira/:id", autenticarToken, salasCadeiraController.atualizarCadeira); // admin
 
 module.exports = router;

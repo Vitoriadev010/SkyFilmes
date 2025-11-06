@@ -80,14 +80,36 @@ exports.listarSalas = async (req, res) => {
 
 
 // ======= Listar sala por ID (CLIENTE) ==========
-// Função original: ListarSalaPorID. Corrigido para retornar o dado.
 
 exports.ListarSalaPorID = async (req, res) => {
-    try {
+
+  const authHeader = req.headers.authorization;
+
+  try {
+    // ===== Verificação do token (Mantida conforme seu código original) =====
+    const token = authHeader.startsWith("Bearer ")
+      ? authHeader.split(" ")[1]
+      : authHeader;
+
+    const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
+      if (err) {
+        console.log(err);
+        return res.status(403).json({ erro: "Token inválido ou expirado." });
+      }
+      console.log(decoded);
+      return decoded;
+    });
+    
+    if(!autenticado) {
+        return; 
+    }
+
+    console.log("gestor:", autenticado);
+
+   
         const { id } = req.params;
 
         const sala = await models.salas.findByPk(id, {
-            // Inclui o tipo de sala para dar mais detalhes ao cliente
             include: [
                 { model: models.salasTipo, as: 'idSalasTipo_salasTipo' }
             ]
@@ -97,7 +119,7 @@ exports.ListarSalaPorID = async (req, res) => {
             return res.status(404).json({ error: "Sala não encontrada!" });
         }
         
-        return res.status(200).json(sala); // CORRIGIDO: Retornando o resultado
+        return res.status(200).json(sala); 
 
     } catch (error) {
         console.error("Erro ao buscar sala por ID:", error);
@@ -107,7 +129,6 @@ exports.ListarSalaPorID = async (req, res) => {
 
 
 // ======== Atualizar sala (ADMIN) =========
-// Conflito de merge/duplicação de código resolvido.
 
 exports.atualizarSala = async (req, res) => {
   const authHeader = req.headers.authorization;

@@ -5,8 +5,8 @@ const { autenticarToken } = require("../service/token");
    
 
 router.post("/adicionarGenero",autenticarToken, generoController.adicionarGenero); // admin
-router.get("/listargeneros", generoController.listarGeneros); // todos   
-router.patch("/:id", autenticarToken, generoController.atualizarGenero); // admin 
+router.get("/listargeneros", generoController.listarGeneros); // todos
+router.patch("/atualizargenero/:id", autenticarToken, generoController.atualizarGenero); // admin
 router.delete("/:id", autenticarToken, generoController.deletarGenero); // admin
 
 

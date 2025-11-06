@@ -54,8 +54,31 @@ exports.adicionarCadeira = async (req, res) => {
 // ======== Listar cadeiras (TODOS) ===========
 
 exports.listarCadeiras = async (req, res) => {
-     try {
-        // CORRIGIDO: Era salasController.finAll(), agora é models.salasCadeira.findAll()
+
+    const authHeader = req.headers.authorization;
+    
+      try {
+        // ===== Verificação do token (Mantida conforme seu código original) =====
+        const token = authHeader.startsWith("Bearer ")
+          ? authHeader.split(" ")[1]
+          : authHeader;
+    
+        const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
+          if (err) {
+            console.log(err);
+            return res.status(403).json({ erro: "Token inválido ou expirado." });
+          }
+          console.log(decoded);
+          return decoded;
+        });
+        
+        if(!autenticado) {
+            return; 
+        }
+    
+        console.log("gestor:", autenticado);
+    
+     
         const todasCadeiras = await models.salasCadeira.findAll();
 
         return res.status(200).json(todasCadeiras);
@@ -67,13 +90,34 @@ exports.listarCadeiras = async (req, res) => {
 };
 
 // ========== Listar cadeiras por idSala (TODOS) ==========
-// Rota original: /listarcadeiras/:idSala. O controller chamava listarCadeiraId.
-// Corrigido para buscar por idSala (parâmetro da rota) e retornar o resultado.
+
 
 exports.listarCadeiraId = async (req, res) => {
-    const { idSala } = req.params; // Usando o idSala da rota
-    try {
-        // CORRIGIDO: Era salasController.findByPk(id), que não funcionaria
+    const { idSala } = req.params; 
+    const authHeader = req.headers.authorization;
+    
+      try {
+        // ===== Verificação do token (Mantida conforme seu código original) =====
+        const token = authHeader.startsWith("Bearer ")
+          ? authHeader.split(" ")[1]
+          : authHeader;
+    
+        const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
+          if (err) {
+            console.log(err);
+            return res.status(403).json({ erro: "Token inválido ou expirado." });
+          }
+          console.log(decoded);
+          return decoded;
+        });
+        
+        if(!autenticado) {
+            return; 
+        }
+    
+        console.log("gestor:", autenticado);
+    
+   
         const cadeiras = await models.salasCadeira.findAll({
             where: { idSala: idSala }
         });
@@ -82,7 +126,7 @@ exports.listarCadeiraId = async (req, res) => {
             return res.status(404).send("Cadeiras não encontradas para a sala informada!");
         }
 
-        return res.status(200).json(cadeiras); // CORRIGIDO: Retornando o resultado
+        return res.status(200).json(cadeiras); 
     } catch (error) {
         console.error("erro ao buscar cadeira por id: ", error);
         return res.status(500).json({error: "erro ao buscar cadeira por id!"});

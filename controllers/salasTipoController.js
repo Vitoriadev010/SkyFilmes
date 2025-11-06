@@ -110,8 +110,31 @@ exports.atualizarTipoSala = async (req, res) => {
 
 exports.listarTiposSalas = async (req, res) => {
 
-  try {
-    // USANDO models.salasTipo CORRETAMENTE
+  const authHeader = req.headers.authorization;
+  
+    try {
+      // ===== Verificação do token (Mantida conforme seu código original) =====
+      const token = authHeader.startsWith("Bearer ")
+        ? authHeader.split(" ")[1]
+        : authHeader;
+  
+      const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
+        if (err) {
+          console.log(err);
+          return res.status(403).json({ erro: "Token inválido ou expirado." });
+        }
+        console.log(decoded);
+        return decoded;
+      });
+      
+      if(!autenticado) {
+          return; 
+      }
+  
+      console.log("gestor:", autenticado);
+  
+
+ 
     const tiposSalas = await models.salasTipo.findAll();
     return res.status(200).json(tiposSalas);
   } catch (error) {

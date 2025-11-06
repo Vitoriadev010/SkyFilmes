@@ -6,11 +6,11 @@ const salasTipoController = require("../controllers/salasTipoController");
 const { autenticarToken } = require("../service/token");
 
 
-// comandos dos tipos de sala **ADMIN** 
+// comandos dos tipos de sala
 
 router.post("/adicionartiposala", autenticarToken, salasTipoController.adicionarTipoSala); // admin 
 router.patch("/:id", autenticarToken, salasTipoController.atualizarTipoSala); // admin 
-router.get("/listartiposalas", salasTipoController.listarTiposSalas); // todos
+router.get("/listartiposalas", autenticarToken, salasTipoController.listarTiposSalas); // todos
 
 module.exports = router;
  

@@ -237,7 +237,7 @@ exports.listargenerosFilmes = async (req, res) => {
 
 exports.atualizarFilme = async (req, res) => {
   const { id } = req.params;
-  const { titulo, id_genero, classificacao, duracao, sinopse, capa, idioma } = req.body;
+  const { titulo, id_genero, classificacao, duracao, sinopse, capa, idioma, status} = req.body;
   const authHeader = req.headers.authorization;
 
   try {
@@ -272,6 +272,10 @@ exports.atualizarFilme = async (req, res) => {
     if (sinopse) filme.sinopse = sinopse;
     if (capa) filme.capa = capa;
     if (idioma !== undefined && (idioma == 0 || idioma == 1)) filme.idioma = idioma;
+    if (status !== undefined && ![0, 1].includes(status)) {
+      return res.status(400).send("Status inválido. Use 0 para inativo e 1 para ativo.");
+    } // em vez de deletar, apenas atualizar status
+    filme.status = status;
 
     await filme.save();
 
@@ -282,42 +286,3 @@ exports.atualizarFilme = async (req, res) => {
   }
 };
 
-// ======= Deletar filme (ADMIN) =======
-
-exports.deletarFilme = async (req, res) => {
-  const { id } = req.params;
-  const authHeader = req.headers.authorization;
-
-  try {
-    const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
-
-
-    const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
-      if (err) {
-        console.log(err);
-        return res.status(403).json({ erro: 'token inválido ou expirado' });
-      }
-
-      console.log(decoded);
-      return decoded;
-    });
-    console.log('gestor:', autenticado);
-
-    const filme = await Filme.findByPk(id);
-
-    if (!filme) {
-      return res.status(404).send("Filme não encontrado.");
-    }
-
-    await filme.destroy();
-
-    return res.status(200).json({
-      message: "Filme deletado com sucesso!",
-      filmeDeletado: filme
-    });
-
-  } catch (error) {
-    console.error("Erro ao deletar filme:", error);
-    return res.status(500).send("Erro ao deletar o filme.");
-  }
-};
