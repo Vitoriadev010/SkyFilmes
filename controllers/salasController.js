@@ -31,7 +31,6 @@ exports.adicionarSala = async (req, res) => {
     
         console.log('gestor:', autenticado);
 
-        // CORRIGIDO: Removido 'idFilme' do corpo, pois não existe no model 'salas.js'
         let  { idSalasTipo, numero } = req.body;
 
         const novaSala = await models.salas.create({

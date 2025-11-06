@@ -32,15 +32,14 @@ exports.adicionarTipoSala = async (req, res) => {
       console.log('gestor:', autenticado);
 
 
-   
     
-        let { nome, descricao } = req.body;
-        // ATENÇÃO: Seu model salasTipo.js usa 'tipo' e 'valor'.
-        // Mapeando 'nome' -> 'tipo' e ignorando 'descricao' (que não existe no model)
-        // Você deve passar o campo 'valor' no body da requisição, caso contrário, dará erro de 'allowNull: false'
+        let { nome } = req.body;
+        if (!nome) {
+            return res.status(400).json({ error: "O campo 'nome' é obrigatório." });
+        }
         const novoTipoSala = await models.salasTipo.create({
             tipo: nome, 
-            valor: req.body.valor || 0 // Assumindo que precisa de um valor, senão dá erro de validação
+            valor: req.body.valor || 0 
         });
 
         return res.status(201).json(novoTipoSala);

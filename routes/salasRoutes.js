@@ -9,7 +9,7 @@ const { autenticarTokenGestor, autenticarTokenCliente } = require("../service/to
 
 router.post("/adicionarsala", autenticarTokenGestor, salasController.adicionarSala); // admin
 router.patch("/:id", autenticarTokenGestor, salasController.atualizarSala); // admin
-router.get("/listarsalas", autenticarTokenGestor, salasController.listarSalas); // admin
-router.get("/:id", autenticarTokenCliente, salasController.ListarSalaPorID); // cliente
+router.get("/listarsalas", autenticarTokenCliente, autenticarTokenGestor, salasController.listarSalas); // todos
+router.get("/:id", autenticarTokenCliente, autenticarTokenCliente, salasController.ListarSalaPorID); // todos
 
 module.exports = router;
