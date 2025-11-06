@@ -3,12 +3,11 @@ const router = express.Router();
 const sessoesController = require("../controllers/sessoesController");
 
 // chamando a verificação do token
-const { autenticarToken } = require("../service/token");
+const { autenticarTokenGestor } = require("../service/token");
 
 // rotas para sessões - gestor //
-router.post("/criarSessao", autenticarToken, sessoesController.criarSessao);
-router.put("/editarSessao", autenticarToken, sessoesController.editarSessao);
-router.delete("/aaa", autenticarToken);
-router.get("/listarSessoes", autenticarToken, sessoesController.listarSessoes);
+router.post("/criarSessao", autenticarTokenGestor, sessoesController.criarSessao);
+router.put("/editarSessao", autenticarTokenGestor, sessoesController.editarSessao);
+router.get("/listarSessoes", autenticarTokenGestor, sessoesController.listarSessoes);
 
 module.exports = router;

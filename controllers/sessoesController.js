@@ -224,7 +224,7 @@ exports.listarSessoes = async (req, res) => {
         console.log('gestor:', autenticado);
 
         // filtro por status se fornecido no corpo da requisição
-        // const where = {};
+        const where = {};
 
         if (status !== undefined) {
             if (Array.isArray(status)) {
