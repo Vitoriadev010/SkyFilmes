@@ -17,6 +17,7 @@ const sessoesClientRoutes = require("./routes/sessoesClientRoutes");
 const salasRoutes = require("./routes/salasRoutes");
 const salaTipoRoutes = require("./routes/salaTipoRoutes");
 const salasCadeiraRoutes = require("./routes/salasCadeiraRoutes");
+const comprovanteRoutes = require("./routes/comprovanteRoutes");
 
 
 
@@ -31,6 +32,8 @@ app.use(sessoesClientRoutes);
 app.use(salasRoutes);
 app.use(salaTipoRoutes);
 app.use(salasCadeiraRoutes);
+app.use(comprovanteRoutes);
+
 
 app.get('/', (req, res) => {
   res.send('Servidor está funcionando corretamente!');

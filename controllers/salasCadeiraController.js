@@ -32,7 +32,7 @@ exports.adicionarCadeira = async (req, res) => {
       console.log('gestor:', autenticado);
 
       // Seu model não usa 'numero', mas vou manter na desestruturação, mas não usar no create.
-      let { idSala, fileira, coluna, numero } = req.body; 
+      let { idSala, fileira, coluna } = req.body; 
 
       // USANDO models.salasCadeira CORRETAMENTE
       const novaCadeira = await models.salasCadeira.create({
