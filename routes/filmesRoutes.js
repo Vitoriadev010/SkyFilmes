@@ -9,9 +9,9 @@ const { autenticarTokenGestor, autenticarTokenCliente } = require("../service/to
 
 router.post("/adicionarfilme", autenticarTokenGestor, filmesController.adicionarFilme); // admin
 router.patch("/:id", autenticarTokenGestor, filmesController.atualizarFilme); // admin
-router.get("/listarfilmes", autenticarTokenGestor, autenticarTokenCliente, filmesController.listarFilmes); // todos
-router.get("/filme/:id_genero", autenticarTokenGestor, autenticarTokenCliente, filmesController.listargenerosFilmes); // todos
-router.get("/filme/:titulo", autenticarTokenGestor, autenticarTokenCliente, filmesController.buscarFilme); //todos
-router.get("/selecionarIdioma/:idioma", autenticarTokenGestor, autenticarTokenCliente, filmesController.selecionarIdioma); // todos
+router.get("/listarfilmes", filmesController.listarFilmes); // todos
+router.get("/filme/:id_genero", filmesController.listargenerosFilmes); // todos
+router.get("/filme/:titulo", filmesController.buscarFilme); //todos
+router.get("/selecionarIdioma/:idioma", filmesController.selecionarIdioma); // todos
 
 module.exports = router;
