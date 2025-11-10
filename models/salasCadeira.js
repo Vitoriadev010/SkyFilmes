@@ -16,7 +16,7 @@ module.exports = function(sequelize, DataTypes) {
       }
     },
     fileira: {
-      type: DataTypes.TEXT,
+      type: DataTypes.STRING(50),
       allowNull: false
     },
     coluna: {
@@ -27,6 +27,10 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 1
+    },
+    numero: {
+      type: DataTypes.STRING(50),
+      allowNull: false
     }
   }, {
     sequelize,

@@ -8,14 +8,22 @@ function corrigirDataSemFuso(req, res, next) {
         }
 
         if (dataStr.includes('/')) {
+            // D/M/YY
             [dia, mes, ano] = dataStr.split('/').map(Number);
-        } else {
+        } else if (dataStr.includes('-')) {
+            // YY‑MM‑DD
             [ano, mes, dia] = dataStr.split('-').map(Number);
+        } else {
+            return res.status(400).json({ erro: 'Formato de data inválido' });
         }
 
         // Corrigir ano com dois dígitos - tava salvando em 1900s
         if (ano < 100) {
             ano += ano < 50 ? 2000 : 1900;
+        }
+
+        if (mes < 1 || mes > 12 || dia < 1 || dia > 31) {
+            return res.status(400).json({ erro: 'Data inválida' });
         }
 
         // criando a data sem mexer no fuso

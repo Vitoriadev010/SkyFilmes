@@ -6,6 +6,7 @@ const gestorController = require("../controllers/gestorController");
 // chamando a verificação do token
 const { autenticarTokenGestor } = require("../service/token");
 
+
 // // cliente cadastra-se e loga-se//
 router.post("/cadastrarCliente", clienteController.cadastrarCliente);
 router.post("/logarCliente", clienteController.logarCliente);

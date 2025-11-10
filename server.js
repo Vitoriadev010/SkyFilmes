@@ -17,7 +17,11 @@ const sessoesClientRoutes = require("./routes/sessoesClientRoutes");
 const salasRoutes = require("./routes/salasRoutes");
 const salaTipoRoutes = require("./routes/salaTipoRoutes");
 const salasCadeiraRoutes = require("./routes/salasCadeiraRoutes");
+<<<<<<< HEAD
 const comprovanteRoutes = require("./routes/comprovanteRoutes");
+=======
+const vendasRoutes = require("./routes/vendasRoutes");
+>>>>>>> 245f3853e4827f9149842c6ad85393e1ad387d2f
 
 
 
@@ -32,8 +36,12 @@ app.use(sessoesClientRoutes);
 app.use(salasRoutes);
 app.use(salaTipoRoutes);
 app.use(salasCadeiraRoutes);
+<<<<<<< HEAD
 app.use(comprovanteRoutes);
 
+=======
+app.use(vendasRoutes);
+>>>>>>> 245f3853e4827f9149842c6ad85393e1ad387d2f
 
 app.get('/', (req, res) => {
   res.send('Servidor está funcionando corretamente!');
