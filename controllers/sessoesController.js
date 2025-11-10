@@ -20,7 +20,7 @@ const SECRET = 'APIbilheteria';
 exports.criarSessao = async (req, res) => {
     console.log('criando sessao');
     const authHeader = req.headers.authorization;
-    const { idFilme, idSala, hora, data } = req.body;
+    const { idFilme, idSala, idSalasTipo, hora, data } = req.body;
 
     try {
         const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
@@ -60,6 +60,7 @@ exports.criarSessao = async (req, res) => {
         const novaSessao = await models.sessoes.create({
             idFilme: idFilme,
             idSala: idSala,
+            idSalasTipo: idSalasTipo,
             hora: hora,
             data: data
         });
@@ -96,17 +97,14 @@ exports.criarSessao = async (req, res) => {
                     as: 'idSala_sala',
                     attributes: [
                         'numero'
-                    ],
-                    include: [
-                        {
-                            model: models.salasTipo,
-                            as: 'idSalasTipo_salasTipo',
-                            attributes: [
-                                'tipo',
-                                'valor'
-                            ]
-
-                        }
+                    ]
+                },
+                {
+                    model: models.salasTipo,
+                    as: 'idSalasTipo_salasTipo',
+                    attributes: [
+                        'tipo',
+                        'valor'
                     ]
                 }
             ]
