@@ -5,51 +5,61 @@ const initModels = require("../models/init-models");
 const models = initModels(sequelize, Sequelize.DataTypes);
 
 const jwt = require('jsonwebtoken'); // Mantido, conforme código original
+const salasCadeira = require("../models/salasCadeira");
 const SECRET = 'APIbilheteria'; // Mantido, conforme código original
 
-
-// ========= Adicionar nova cadeira (ADMIN)  =========
+// ========= Adicionar nova(s) cadeira(s) (ADMIN) =========
 
 exports.adicionarCadeira = async (req, res) => {
+  const authHeader = req.headers.authorization;
 
-      // adicionando verificação do token
-    const authHeader = req.headers.authorization;
-  
-    try {
-      const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
-  
-  
-      const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
-        if (err) {
-          console.log(err);
-          return res.status(403).json({ erro: 'token inválido ou expirado' });
-        }
-  
-        console.log(decoded);
-        return decoded;
-      });
-  
-      console.log('gestor:', autenticado);
+  try {
+    // ===== Verificação do token =====
+    const token = authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
 
-      // Seu model não usa 'numero', mas vou manter na desestruturação, mas não usar no create.
-      let { idSala, fileira, coluna } = req.body; 
-
-      // USANDO models.salasCadeira CORRETAMENTE
-      const novaCadeira = await models.salasCadeira.create({
-        idSala,
-        fileira,
-        coluna,
-        // numero (Não existe no seu model)
-      });
-
-      return res.status(201).json(novaCadeira);
-    } catch (error) {
-        console.error("erro ao adicionar nova cadeira: ", error);
-        return res.status(500).json({error: "erro ao adicionar nova cadeira!"});
+    if (!token) {
+      return res.status(401).json({ erro: 'Token não fornecido!' });
     }
 
+    const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
+      if (err) {
+        console.log(err);
+        return null;
+      }
+      return decoded;
+    });
 
+    if (!autenticado) {
+      return res.status(403).json({ erro: 'Token inválido ou expirado!' });
+    }
+
+    console.log('Gestor autenticado:', autenticado);
+
+    // ===== Verifica se o corpo é um array ou um único objeto =====
+    const body = req.body;
+
+    // Caso receba várias cadeiras (array)
+    if (Array.isArray(body)) {
+      const criadas = await models.salasCadeira.bulkCreate(body);
+      return res.status(201).json({
+        message: `${criadas.length} cadeiras criadas com sucesso!`,
+        cadeiras: criadas
+      });
+    }
+
+    // Caso receba uma cadeira só (objeto)
+    const novaCadeira = await models.salasCadeira.create(body);
+    return res.status(201).json({
+      message: "Cadeira criada com sucesso!",
+      cadeira: novaCadeira
+    });
+
+  } catch (error) {
+    console.error("Erro ao adicionar cadeira(s):", error);
+    return res.status(500).json({ error: "Erro ao adicionar cadeira(s)!" });
+  }
 };
+
 
 // ======== Listar cadeiras (TODOS) ===========
 

@@ -1,8 +1,14 @@
 
 
 const { sequelize, Sequelize } = require("../models/db");
-const Filme = require("../models/filmes")(sequelize, Sequelize.DataTypes);
-const Genero = require("../models/generos");
+
+const initModels = require("../models/init-models");
+const models = initModels(sequelize, Sequelize.DataTypes);
+
+const Filme = models.filmes;
+const Genero = models.generos;
+
+
 
 // token
 const jwt = require('jsonwebtoken');
@@ -88,26 +94,11 @@ exports.adicionarFilme = async (req, res) => {
 // ======= Listar todos os filmes (TODOS) =======
 
 exports.listarFilmes = async (req, res) => {
-  const authHeader = req.headers.authorization;
-
-  try {
-    const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
+  try{
 
 
-    const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
-      if (err) {
-        console.log(err);
-        return res.status(403).json({ erro: 'token inválido ou expirado' });
-      }
-
-      console.log(decoded);
-      return decoded;
-    });
-    console.log('gestor:', autenticado);
-
-
-    const filmes = await Filme.findAll({
-      include: [{ model: Genero, attributes: ["nome"] }]
+    const filmes = await  models.filmes.findAll({
+   include: [{ model: Genero, as: "genero", attributes: ["nome"] }]
     });
     res.json(filmes);
   } catch (error) {
@@ -142,9 +133,9 @@ exports.selecionarIdioma = async (req, res) => {
     }
 
     // Buscar filmes com o idioma especificado
-    const filmes = await Filme.findAll({
+    const filmes = await  models.filmes.findAll({
       where: { idioma },
-      include: [{ model: Genero, attributes: ["nome"] }]
+      include: [{ model: Genero, as: "idGenero_genero", attributes: ["nome"] }]
     });
 
     if (filmes.length === 0) {
@@ -182,7 +173,7 @@ exports.buscarFilme = async (req, res) => {
 
     const filme = await Filme.findOne({
       where: { titulo },
-      include: [Genero],
+     include: [{ model: Genero, as: "idGenero_genero", attributes: ["nome"] }]
     });
 
     if (!filme) {
@@ -217,9 +208,9 @@ exports.listargenerosFilmes = async (req, res) => {
     });
     console.log('gestor:', autenticado);
 
-    const filmes = await Filme.findAll({
+    const filmes = await  models.filmes.findAll({
       where: { id_genero },
-      include: [{ model: Genero, attributes: ["nome"] }]
+      include: [{ model: Genero, as: "idGenero_genero", attributes: ["nome"] }]
     });
 
     if (filmes.length === 0) {

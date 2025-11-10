@@ -42,6 +42,7 @@ function initModels(sequelize) {
   sessoes.hasMany(vendas, { as: "vendas", foreignKey: "idSessao"});
   vendasItens.belongsTo(vendas, { as: "idVenda_venda", foreignKey: "idVenda"});
   vendas.hasMany(vendasItens, { as: "vendasItens", foreignKey: "idVenda"});
+  
 
   return {
     clientes,
