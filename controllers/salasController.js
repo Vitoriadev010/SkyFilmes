@@ -12,24 +12,8 @@ const SECRET = 'APIbilheteria';
 
 exports.adicionarSala = async (req, res) => {
 
-      // adicionando verificação do token
-      const authHeader = req.headers.authorization;
-    
-      try {
-        const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
-    
-    
-        const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
-          if (err) {
-            console.log(err);
-            return res.status(403).json({ erro: 'token inválido ou expirado' });
-          }
-    
-          console.log(decoded);
-          return decoded;
-        });
-    
-        console.log('gestor:', autenticado);
+  // adicionando verificação do token
+  const authHeader = req.headers.authorization;
 
         let  { ideSala, numero } = req.body;
 
@@ -37,13 +21,36 @@ exports.adicionarSala = async (req, res) => {
             ideSala,
             numero
         });
+  try {
+    const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
 
-        return res.status(201).json(novaSala);
 
-    } catch (error) {
-        console.error("erro ao adicionar nova sala:", error);
-        return res.status(500).json({error: "erro ao adicionar nova sala!"});
-    }
+    const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
+      if (err) {
+        console.log(err);
+        return res.status(403).json({ erro: 'token inválido ou expirado' });
+      }
+
+      console.log(decoded);
+      return decoded;
+    });
+
+    console.log('gestor:', autenticado);
+
+    // CORRIGIDO: Removido 'idFilme' do corpo, pois não existe no model 'salas.js'
+    let { idSalasTipo, numero } = req.body;
+
+    const novaSala = await models.salas.create({
+      idSalasTipo,
+      numero
+    });
+
+    return res.status(201).json(novaSala);
+
+  } catch (error) {
+    console.error("erro ao adicionar nova sala:", error);
+    return res.status(500).json({ error: "erro ao adicionar nova sala!" });
+  }
 
 };
 
@@ -98,32 +105,28 @@ exports.ListarSalaPorID = async (req, res) => {
       console.log(decoded);
       return decoded;
     });
-    
-    if(!autenticado) {
-        return; 
+
+    if (!autenticado) {
+      return;
     }
 
     console.log("gestor:", autenticado);
 
-   
-        const { id } = req.params;
 
-        const sala = await models.salas.findByPk(id, {
-            include: [
-                { model: models.salasTipo, as: 'idSalasTipo_salasTipo' }
-            ]
-        });
+    const { id } = req.params;
 
-        if (!sala) {
-            return res.status(404).json({ error: "Sala não encontrada!" });
-        }
-        
-        return res.status(200).json(sala); 
+    const sala = await models.salas.findByPk(id);
 
-    } catch (error) {
-        console.error("Erro ao buscar sala por ID:", error);
-        return res.status(500).json({ error: "Erro ao buscar sala por ID!" });
+    if (!sala) {
+      return res.status(404).json({ error: "Sala não encontrada!" });
     }
+
+    return res.status(200).json(sala);
+
+  } catch (error) {
+    console.error("Erro ao buscar sala por ID:", error);
+    return res.status(500).json({ error: "Erro ao buscar sala por ID!" });
+  }
 };
 
 
@@ -146,17 +149,17 @@ exports.atualizarSala = async (req, res) => {
       console.log(decoded);
       return decoded;
     });
-    
-    if(!autenticado) {
-        return; 
+
+    if (!autenticado) {
+      return;
     }
 
     console.log("gestor:", autenticado);
 
     // ===== Pega o ID da sala =====
     const { id } = req.params;
-    
-    const { idSalasTipo, numero, status } = req.body; 
+
+    const { idSalasTipo, numero, status } = req.body;
 
     // ===== Verifica se a sala existe =====
     const sala = await models.salas.findByPk(id);
@@ -173,7 +176,7 @@ exports.atualizarSala = async (req, res) => {
 
     if (idSalasTipo) sala.idSalasTipo = idSalasTipo;
     if (status !== undefined) sala.status = status;
-     
+
     if (status !== undefined && ![0, 1].includes(status)) {
       return res.status(400).send("Status inválido. Use 0 para inativo e 1 para ativo.");
     } // em vez de deletar, apenas atualizar status

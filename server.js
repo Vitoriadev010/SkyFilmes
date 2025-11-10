@@ -23,7 +23,7 @@ const vendasRoutes = require("./routes/vendasRoutes");
 
 
 app.use(express.json());
-app.use(FilmesRoutes);
+app.use('/filmes', FilmesRoutes);
 app.use(GeneroRoutes);
 app.use(adminFilmesRoutes);
 app.use(adminGeneroRoutes);
@@ -36,6 +36,7 @@ app.use(salasCadeiraRoutes);
 app.use(comprovanteRoutes);
 
 app.use(vendasRoutes);
+app.use('/vendas', vendasRoutes);
 
 app.get('/', (req, res) => {
   res.send('Servidor está funcionando corretamente!');
