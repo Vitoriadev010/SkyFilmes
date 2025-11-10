@@ -31,10 +31,10 @@ exports.adicionarSala = async (req, res) => {
     
         console.log('gestor:', autenticado);
 
-        let  { idSalasTipo, numero } = req.body;
+        let  { ideSala, numero } = req.body;
 
         const novaSala = await models.salas.create({
-            idSalasTipo,
+            ideSala,
             numero
         });
 

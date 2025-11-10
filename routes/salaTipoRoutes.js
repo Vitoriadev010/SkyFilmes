@@ -8,7 +8,7 @@ const { autenticarTokenGestor, autenticarTokenCliente } = require("../service/to
 
 // comandos dos tipos de sala
 
-router.post("/adicionartiposala", salasTipoController.adicionarTipoSala); // admin 
+router.post("/adicionartiposala", autenticarTokenGestor, salasTipoController.adicionarTipoSala); // admin 
 router.patch("/:id", autenticarTokenGestor, salasTipoController.atualizarTipoSala); // admin 
 router.get("/listartiposalas", autenticarTokenGestor, autenticarTokenCliente, salasTipoController.listarTiposSalas); // todos
 
