@@ -100,7 +100,7 @@ exports.criarSessao = async (req, res) => {
                     include: [
                         {
                             model: models.salasTipo,
-                            as: 'idSalasTipo_salasTipo',
+                            as: 'ideSala_salasTipo',
                             attributes: [
                                 'tipo',
                                 'valor'

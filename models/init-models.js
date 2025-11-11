@@ -36,8 +36,8 @@ function initModels(sequelize) {
   salas.hasMany(vendas, { as: "vendas", foreignKey: "idSala"});
   vendasItens.belongsTo(salasCadeira, { as: "idSalasCadeira_salasCadeira", foreignKey: "idSalasCadeira"});
   salasCadeira.hasMany(vendasItens, { as: "vendasItens", foreignKey: "idSalasCadeira"});
-  salas.belongsTo(salasTipo, { as: "idSalasTipo_salasTipo", foreignKey: "idSalasTipo"});
-  salasTipo.hasMany(salas, { as: "salas", foreignKey: "idSalasTipo"});
+  salas.belongsTo(salasTipo, { as: 'ideSala_salasTipo', foreignKey: 'ideSala'});
+  salasTipo.hasMany(salas, { as: 'salas', foreignKey: 'ideSala'});
   vendas.belongsTo(sessoes, { as: "idSessao_sesso", foreignKey: "idSessao"});
   sessoes.hasMany(vendas, { as: "vendas", foreignKey: "idSessao"});
   vendasItens.belongsTo(vendas, { as: "idVenda_venda", foreignKey: "idVenda"});
@@ -48,7 +48,7 @@ function initModels(sequelize) {
     clientes,
     filmes,
     generos,
-    gestores,
+    gestores,  
     salas,
     salasCadeira,
     salasTipo,
