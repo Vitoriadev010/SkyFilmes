@@ -7,17 +7,6 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       primaryKey: true
     },
-<<<<<<< HEAD
-    ideSala: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'salasTipo',
-        key: 'ideSala'
-      }
-    },
-=======
->>>>>>> 689706760c46a6901a3aa06eac8aad8683e82272
     numero: {
       type: DataTypes.INTEGER,
       allowNull: false
@@ -40,16 +29,6 @@ module.exports = function(sequelize, DataTypes) {
           { name: "ideSala" },
         ]
       },
-<<<<<<< HEAD
-      {
-        name: "ideSala",
-        using: "BTREE",
-        fields: [
-          { name: "ideSala" },
-        ]
-      },
-=======
->>>>>>> 689706760c46a6901a3aa06eac8aad8683e82272
     ]
   });
 };

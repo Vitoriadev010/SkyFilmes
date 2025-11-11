@@ -9,5 +9,7 @@ const { autenticarTokenCliente } = require("../service/token");
 
 router.post("/realizarVenda", autenticarTokenGestor, autenticarTokenCliente, vendasController.realizarVenda);
 router.get("/vendasCLiente/:idCliente", autenticarTokenCliente, vendasController.vendasPorCLiente);
+router.get("/listarVendas", autenticarTokenGestor, vendasController.listarvendas);
+router.put("/atualizarVendaStatus/:idVenda", autenticarTokenGestor, vendasController.editarVenda);
 
 module.exports = router;

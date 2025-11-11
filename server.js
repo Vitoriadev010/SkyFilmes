@@ -24,18 +24,16 @@ const vendasRoutes = require("./routes/vendasRoutes");
 
 app.use(express.json());
 app.use('/filmes', FilmesRoutes);
-app.use(GeneroRoutes);
-app.use(adminFilmesRoutes);
-app.use(adminGeneroRoutes);
-app.use(gestorCadasLoginRoutes);
-app.use(sessoesRoutes);
-app.use(sessoesClientRoutes);
-app.use(salasRoutes);
-app.use(salaTipoRoutes);
-app.use(salasCadeiraRoutes);
-app.use(comprovanteRoutes);
-
-app.use(vendasRoutes);
+app.use('/genero', GeneroRoutes);
+app.use('/adminFilmes', adminFilmesRoutes);
+app.use('/adminGenero', adminGeneroRoutes);
+app.use('/gestorCadLog', gestorCadasLoginRoutes);
+app.use('/adminSessoes', sessoesRoutes);
+app.use('/sessoes', sessoesClientRoutes);
+app.use('/salas', salasRoutes);
+app.use('/salasTipo', salaTipoRoutes);
+app.use('/salasCadeira', salasCadeiraRoutes);
+app.use('/comprovante', comprovanteRoutes);
 app.use('/vendas', vendasRoutes);
 
 app.get('/', (req, res) => {
