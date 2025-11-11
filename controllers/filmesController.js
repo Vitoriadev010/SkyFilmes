@@ -96,10 +96,10 @@ exports.adicionarFilme = async (req, res) => {
 exports.listarFilmes = async (req, res) => {
   try{
 
+  const filmes = await models.filmes.findAll({
+  include: [{ model: Genero, as: 'idGenero_genero' }]
+});
 
-    const filmes = await  models.filmes.findAll({
-   include: [{ model: Genero, as: "genero", attributes: ["nome"] }]
-    });
     res.json(filmes);
   } catch (error) {
     console.error("Erro ao listar filmes:", error);

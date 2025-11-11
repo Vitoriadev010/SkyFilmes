@@ -6,164 +6,91 @@ const jwt = require('jsonwebtoken');
 
 const SECRET = 'APIbilheteria';
 
-// Status de Vendas
-const STATUS_PENDENTE = 1;
-const STATUS_PAGO = 2;
-const STATUS_FALHADO = 3;
 
-/** 
- * @param {Array<number>} ideSalaArray - Array de IDs das cadeiras.
- * @param {object} transaction - Transação Sequelize.
- * @returns {Promise<void>} - Rejeita se os assentos estiverem ocupados.
- */ 
-async function verificarDisponibilidade(ideSalaArray, transaction) {
-    const assentosOcupados = await models.vendasItens.findAll({
-        where: {
-            ideSala: { [Op.in]: ideSalaArray }
-        },
-        include: [{
-            model: models.vendas,
-            as: 'idVenda_venda',
-            where: { status: STATUS_PAGO },
-            required: true 
-        }],
-        transaction: transaction
+
+exports.realizarvenda = async (req, res) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    return res.status(401).json({ erro: 'Token não enviado.' });
+  }
+
+  try {
+
+    const token = authHeader.startsWith('Bearer ')
+      ? authHeader.split(' ')[1]
+      : authHeader;
+
+    const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
+      if (err) {
+        return res.status(403).json({ erro: 'Token inválido ou expirado.' });
+      }
+      return decoded;
     });
 
-    if (assentosOcupados.length > 0) {
-        const idsOcupados = assentosOcupados.map(item => item.ideSala);
-        throw new Error(`Conflito: Assento(s) ${idsOcupados.join(', ')} já estão ocupados.`);
-    }
-}
+    console.log('Gestor autenticado:', autenticado);
 
-exports.realizarVenda = async (req, res) => {
-    console.log('Iniciando realização de venda...');
-    const authHeader = req.headers.authorization;
-    const { idSessao, cadeiras, idCliente } = req.body;
+
+    const { idCliente, idSessao, idSala, qtde, valorTotal } = req.body;
+
+    if (!idCliente || !idSessao || !idSala || !qtde || !valorTotal) {
+      return res.status(400).json({ erro: 'Dados incompletos para realizar a venda.' });
+    }
+
+
+    const t = await sequelize.transaction();
 
     try {
-        const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
+
+      const sessao = await models.sessoes.findByPk(idSessao);
+      if (!sessao) {
+        await t.rollback();
+        return res.status(404).json({ erro: 'Sessão não encontrada.' });
+      }
 
 
-        const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
-            if (err) {
-                console.log(err);
-                return res.status(403).json({ erro: 'token inválido ou expirado' });
-            }
-
-            console.log(decoded);
-            return decoded;
-        });
-
-        console.log('cliente:', autenticado);
-
-        console.log('Cliente autenticado:', idCliente);
-
-        if (!idCliente) {
-            return res.status(400).json({ erro: 'idCliente é obrigatório para administrador' });
-        }
+      if (sessao.assentosDisponiveis < qtde) {
+        await t.rollback();
+        return res.status(400).json({ erro: 'Não há assentos disponíveis suficientes.' });
+      }
 
 
-        if (!idSessao || !cadeiras || !Array.isArray(cadeiras) || cadeiras.length === 0) {
-            return res.status(400).json({ erro: 'sessão e cadeiras são obrigatórios' })
-        }
-
-        const sessao = await models.sessoes.findByPk(idSessao, {
-            include: [
-                {
-                    model: models.salasTipo,
-                    as: 'idSalasTipo_salasTipo',
-                    attributes: ['idSalasTipo', 'tipo', 'valor']
-                }
-            ]
-        });
-
-        if (!sessao) {
-            return res.status(404).json({ erro: 'sessão não encontrada' });
-        }
-
-        const precoIngresso = parseFloat(sessao.idSalasTipo_salasTipo.valor);
-        console.log(`Preço do ingresso (${sessao.idSalasTipo_salasTipo.tipo}): R$ ${precoIngresso}`);
-
-        const cadeirasSelecionadas = await models.salasCadeira.findAll({
-            where: { idSalasCadeira: cadeiras }
-        });
-
-        if (cadeirasSelecionadas.length !== cadeiras.length) {
-            return res.status(400).json({ erro: 'uma ou mais cadeiras não existem' });
-        }
+      const novaVenda = await models.vendas.create(
+        {
+          idCliente,
+          idSessao,
+          idSala,
+          qtde,
+          valorTotal,
+          status: 1,
+        },
+        { transaction: t }
+      );
 
 
-        // mostra se foi escolhido cadeiras já vendidas
-        const cadeirasVendidas = await models.vendasItens.findAll({
-            where: {
-                idSalasCadeira: cadeiras,
-            },
-            include: [
-                {
-                    model: models.vendas,
-                    as: 'idVenda_venda',
-                    where: { idSessao: idSessao }
-                }
-            ]
-        });
-
-        if (cadeirasVendidas.length > 0) {
-            // Retorna as cadeiras que já foram vendidas
-            const numerosVendidos = cadeirasVendidas.map(v => ({
-                id: v.idSalasCadeira
-            }));
-            return res.status(400).json({
-                erro: 'uma ou mais cadeiras já foram vendidas para esta sessão',
-                cadeirasVendidas: numerosVendidos
-            });
-        }
-
-        const valorTotal = precoIngresso * cadeirasSelecionadas.length;
-
-        const novaVenda = await models.vendas.create({
-            idCliente: idCliente,
-            idSala: sessao.idSala,
-            idSessao: idSessao,
-            valorTotal,
-            qtde: cadeirasSelecionadas.length,
-            status: 1
-        });
-
-        const itens = cadeirasSelecionadas.map(cadeira => ({
-            idVenda: novaVenda.idVenda,
-            idSalasCadeira: cadeira.idSalasCadeira,
-            precoUnitario: precoIngresso,
-            status: 1
-        }));
-
-        await models.vendasItens.bulkCreate(itens);
-
-        return res.status(201).json({
-            mensagem: 'Venda realizada com sucesso',
-            venda: {
-                idVenda: novaVenda.idVenda,
-                sessao: {
-                    id: sessao.idSessao,
-                    data: sessao.data,
-                    hora: sessao.hora,
-                    tipoSala: sessao.idSalasTipo_salasTipo.tipo
-                },
-                cadeiras: cadeirasSelecionadas.map(c => ({
-                    id: c.idSalasCadeira,
-                    fileira: c.fileira,
-                    coluna: c.coluna,
-                    numero: c.numero
-                })),
-                precoUnitario: precoIngresso,
-                total: valorTotal
-            }
-        });
+      await sessao.update(
+        { assentosDisponiveis: sessao.assentosDisponiveis - qtde },
+        { transaction: t }
+      );
 
 
-    } catch (error) {
-        console.error('Erro ao realizar venda:', error);
+      await t.commit();
+
+      return res.status(201).json({
+        mensagem: 'Venda realizada com sucesso!',
+        venda: novaVenda,
+      });
+
+    } catch (erroInterno) {
+      await t.rollback();
+      console.error('Erro ao registrar venda:', erroInterno);
+      return res.status(500).json({ erro: 'Erro ao registrar venda.', error });
     }
+
+  } catch (erro) {
+    console.error('Erro de autenticação ou conexão:', erro);
+    return res.status(500).json({ erro: 'Falha na autenticação ou no servidor.' });
+  }
 };
 
 
@@ -285,19 +212,12 @@ exports.vendasPorCLiente = async (req, res) => {
 // LISTAR TODAS AS VENDAS
 
 exports.listarvendas = async (req, res) => {
-<<<<<<< HEAD
-=======
 
-     try{
-
->>>>>>> 689706760c46a6901a3aa06eac8aad8683e82272
-    
  const authHeader = req.headers.authorization;
 
   if (!authHeader) {
     return res.status(401).json({ erro: 'Token não enviado' });
   }
-<<<<<<< HEAD
 
   try {
     const token = authHeader.startsWith('Bearer ')
@@ -319,6 +239,4 @@ exports.listarvendas = async (req, res) => {
         console.error("Erro ao listar todas as vendas:", error);
         res.status(500).send("Erro ao listar todas as vendas.");
     }
-=======
->>>>>>> 689706760c46a6901a3aa06eac8aad8683e82272
 };

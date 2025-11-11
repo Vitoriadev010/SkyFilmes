@@ -97,7 +97,6 @@ exports.criarSessao = async (req, res) => {
                     as: 'idSala_sala',
                     attributes: [
                         'numero'
-<<<<<<< HEAD
                     ],
                     include: [
                         {
@@ -109,7 +108,6 @@ exports.criarSessao = async (req, res) => {
                             ]
 
                         }
-=======
                     ]
                 },
                 {
@@ -118,7 +116,6 @@ exports.criarSessao = async (req, res) => {
                     attributes: [
                         'tipo',
                         'valor'
->>>>>>> 689706760c46a6901a3aa06eac8aad8683e82272
                     ]
                 }
             ]

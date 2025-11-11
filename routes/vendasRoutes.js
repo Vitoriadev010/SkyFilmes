@@ -7,7 +7,9 @@ const vendasController = require("../controllers/vendasController");
 const { autenticarTokenGestor } = require("../service/token");
 const { autenticarTokenCliente } = require("../service/token");
 
-router.post("/realizarVenda", autenticarTokenGestor, autenticarTokenCliente, vendasController.realizarVenda);
+
+router.post("/realizarvenda", autenticarTokenCliente, vendasController.realizarvenda);
 router.get("/vendasCLiente/:idCliente", autenticarTokenCliente, vendasController.vendasPorCLiente);
+router.get("/listarvendas", autenticarTokenGestor, vendasController.listarvendas);
 
 module.exports = router;
