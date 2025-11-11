@@ -8,33 +8,36 @@ const SECRET = "APIbilheteria";
 // ======== Adicionar sala (ADMIN) =========
 exports.adicionarSala = async (req, res) => {
   const authHeader = req.headers.authorization;
-  if (!authHeader) {
-    return res.status(401).json({ erro: "Token não enviado" });
-  }
 
   try {
-    const token = authHeader.startsWith("Bearer ")
-      ? authHeader.split(" ")[1]
-      : authHeader;
+    const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
 
-    const autenticado = jwt.verify(token, SECRET);
-    console.log("gestor:", autenticado);
 
-    const { numero, status } = req.body;
+    const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
+      if (err) {
+        console.log(err);
+        return res.status(403).json({ erro: 'token inválido ou expirado' });
+      }
 
-    if (!numero) {
-      return res.status(400).json({ erro: "Campo obrigatório: numero" });
-    }
+      console.log(decoded);
+      return decoded;
+    });
+
+    console.log('gestor:', autenticado);
+
+    // CORRIGIDO: Removido 'idFilme' do corpo, pois não existe no model 'salas.js'
+    let { idSalasTipo, numero } = req.body;
 
     const novaSala = await models.salas.create({
-      numero,
-      status: status ?? 1,
+      idSalasTipo,
+      numero
     });
 
     return res.status(201).json(novaSala);
+
   } catch (error) {
-    console.error("Erro ao adicionar nova sala:", error);
-    return res.status(500).json({ erro: "Erro ao adicionar nova sala!" });
+    console.error("erro ao adicionar nova sala:", error);
+    return res.status(500).json({ error: "erro ao adicionar nova sala!" });
   }
 };
 
@@ -77,7 +80,12 @@ exports.ListarSalaPorID = async (req, res) => {
 
     const { id } = req.params;
 
-    const sala = await models.salas.findByPk(id);
+    const sala = await models.salas.findOne({
+      where: { idSala: id },
+      include: [
+        { model: models.salasTipo, as: 'ideSala_salasTipo' }
+      ]
+    });
 
     if (!sala) {
       return res.status(404).json({ erro: "Sala não encontrada!" });
@@ -105,7 +113,8 @@ exports.atualizarSala = async (req, res) => {
     console.log("gestor:", autenticado);
 
     const { id } = req.params;
-    const { numero, status } = req.body;
+    const { ideSala, numero, status } = req.body;
+
 
     const sala = await models.salas.findByPk(id);
     if (!sala) {

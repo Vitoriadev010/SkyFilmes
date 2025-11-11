@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('salasTipo', {
-    ideSala: {
+    idSalasTipo: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -22,7 +22,7 @@ module.exports = function(sequelize, DataTypes) {
     }
   }, {
     sequelize,
-    tableName: 'salasTipo',
+    tableName: 'salasTipo',  
     timestamps: false,
     indexes: [
       {
@@ -30,7 +30,7 @@ module.exports = function(sequelize, DataTypes) {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "ideSala" },
+          { name: "idSalasTipo" },
         ]
       },
     ]
