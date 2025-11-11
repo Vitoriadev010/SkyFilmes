@@ -7,33 +7,14 @@ const jwt = require('jsonwebtoken');
 const SECRET = 'APIbilheteria';
 
 
-<<<<<<< HEAD
-
-exports.realizarvenda = async (req, res) => {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader) {
-    return res.status(401).json({ erro: 'Token não enviado.' });
-  }
-
-  try {
-
-    const token = authHeader.startsWith('Bearer ')
-      ? authHeader.split(' ')[1]
-      : authHeader;
-
-    const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
-      if (err) {
-        return res.status(403).json({ erro: 'Token inválido ou expirado.' });
-      }
-      return decoded;
-=======
 /** 
  * @param {Array<number>} ideSalaArray - Array de IDs das cadeiras.
  * @param {object} transaction - Transação Sequelize.
  * @returns {Promise<void>} - Rejeita se os assentos estiverem ocupados.
  */
 async function verificarDisponibilidade(ideSalaArray, transaction) {
+
+    
     const assentosOcupados = await models.vendasItens.findAll({
         where: {
             ideSala: { [Op.in]: ideSalaArray }
@@ -45,71 +26,70 @@ async function verificarDisponibilidade(ideSalaArray, transaction) {
             required: true
         }],
         transaction: transaction
->>>>>>> 522f3e051cfa72612ae16bdb8656a1872dbdb584
     });
 
     console.log('Gestor autenticado:', autenticado);
+    }
 
-
+  exports.realizarvenda = async (req, res) => {
+  let t; 
+  try {
     const { idCliente, idSessao, idSala, qtde, valorTotal } = req.body;
+
 
     if (!idCliente || !idSessao || !idSala || !qtde || !valorTotal) {
       return res.status(400).json({ erro: 'Dados incompletos para realizar a venda.' });
     }
 
 
-    const t = await sequelize.transaction();
-
-    try {
-
-      const sessao = await models.sessoes.findByPk(idSessao);
-      if (!sessao) {
-        await t.rollback();
-        return res.status(404).json({ erro: 'Sessão não encontrada.' });
-      }
+    t = await sequelize.transaction();
 
 
-      if (sessao.assentosDisponiveis < qtde) {
-        await t.rollback();
-        return res.status(400).json({ erro: 'Não há assentos disponíveis suficientes.' });
-      }
-
-
-      const novaVenda = await models.vendas.create(
-        {
-          idCliente,
-          idSessao,
-          idSala,
-          qtde,
-          valorTotal,
-          status: 1,
-        },
-        { transaction: t }
-      );
-
-
-      await sessao.update(
-        { assentosDisponiveis: sessao.assentosDisponiveis - qtde },
-        { transaction: t }
-      );
-
-
-      await t.commit();
-
-      return res.status(201).json({
-        mensagem: 'Venda realizada com sucesso!',
-        venda: novaVenda,
-      });
-
-    } catch (erroInterno) {
+    const sessao = await models.sessoes.findByPk(idSessao);
+    if (!sessao) {
       await t.rollback();
-      console.error('Erro ao registrar venda:', erroInterno);
-      return res.status(500).json({ erro: 'Erro ao registrar venda.', error });
+      return res.status(404).json({ erro: 'Sessão não encontrada.' });
     }
 
-  } catch (erro) {
-    console.error('Erro de autenticação ou conexão:', erro);
-    return res.status(500).json({ erro: 'Falha na autenticação ou no servidor.' });
+
+    if (sessao.assentosDisponiveis < qtde) {
+      await t.rollback();
+      return res.status(400).json({ erro: 'Não há assentos disponíveis suficientes.' });
+    }
+
+
+    const novaVenda = await models.vendas.create(
+      {
+        idCliente,
+        idSessao,
+        idSala,
+        qtde,
+        valorTotal,
+        status: 1, 
+      },
+      { transaction: t }
+    );
+
+
+    await sessao.update(
+      { assentosDisponiveis: sessao.assentosDisponiveis - qtde },
+      { transaction: t }
+    );
+
+
+    await t.commit();
+
+    return res.status(201).json({
+      mensagem: 'Venda realizada com sucesso!',
+      venda: novaVenda,
+    });
+  } catch (erroInterno) {
+    if (t) await t.rollback(); 
+    console.error('Erro ao registrar venda:', erroInterno);
+    return res.status(500).json({
+      erro: 'Erro ao registrar venda.',
+      detalhes: erroInterno.message,
+    });
   }
 };
 
@@ -235,13 +215,6 @@ exports.vendasPorCLiente = async (req, res) => {
 
 exports.listarvendas = async (req, res) => {
 
-<<<<<<< HEAD
- const authHeader = req.headers.authorization;
-
-  if (!authHeader) {
-    return res.status(401).json({ erro: 'Token não enviado' });
-  }
-=======
     const authHeader = req.headers.authorization;
 
     try {
@@ -255,7 +228,6 @@ exports.listarvendas = async (req, res) => {
             }
             return decoded;
         });
->>>>>>> 522f3e051cfa72612ae16bdb8656a1872dbdb584
 
         console.log('gestor:', autenticado);
 

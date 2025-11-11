@@ -29,16 +29,6 @@ module.exports = function(sequelize, DataTypes) {
           { name: "ideSala" },
         ]
       },
-<<<<<<< HEAD
-      {
-        name: "ideSala",
-        using: "BTREE",
-        fields: [
-          { name: "ideSala" },
-        ]
-      },
-=======
->>>>>>> 522f3e051cfa72612ae16bdb8656a1872dbdb584
     ]
   });
 };
