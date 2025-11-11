@@ -306,8 +306,6 @@ exports.listarvendas = async (req, res) => {
 
      try{
 
-
-    const vendas = await  models.vendas.findAll;
     
     res.json(vendas);
   } catch (error) {
