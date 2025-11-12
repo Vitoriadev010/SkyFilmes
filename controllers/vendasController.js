@@ -7,58 +7,68 @@ const jwt = require('jsonwebtoken');
 const SECRET = 'APIbilheteria';
 
 
-/** 
- * @param {Array<number>} ideSalaArray - Array de IDs das cadeiras.
+/// STATUS DE VENDAS
+const STATUS_PENDENTE = 1;
+const STATUS_PAGO = 2;
+const STATUS_FALHADO = 3;
+
+
+
+/**
+ * @param {Array<number>} idSalasCadeiraArray - Array de IDs das cadeiras.
  * @param {object} transaction - Transação Sequelize.
  * @returns {Promise<void>} - Rejeita se os assentos estiverem ocupados.
  */
-async function verificarDisponibilidade(ideSalaArray, transaction) {
+async function verificarDisponibilidade(idSalasCadeiraArray , transaction) {
+  const assentosOcupados = await models.vendasItens.findAll({
+    where: {
+      idSalasCadeira: { [Op.in]: idSalasCadeiraArray },
+    },
+    include: [
+      {
+        model: models.vendas,
+        as: "idVenda_venda",
+        where: { status: STATUS_PAGO },
+        required: true,
+      },
+    ],
+    transaction,
+  });
 
-    
-    const assentosOcupados = await models.vendasItens.findAll({
-        where: {
-            ideSala: { [Op.in]: ideSalaArray }
-        },
-        include: [{
-            model: models.vendas,
-            as: 'idVenda_venda',
-            where: { status: STATUS_PAGO },
-            required: true
-        }],
-        transaction: transaction
-    });
+  if (assentosOcupados.length > 0) {
+    throw new Error("Alguns assentos selecionados já estão ocupados!");
+  }
+}
 
-    console.log('Gestor autenticado:', autenticado);
-    }
 
-  exports.realizarvenda = async (req, res) => {
-  let t; 
+exports.realizarvenda = async (req, res) => {
+  let t;
+
   try {
     const { idCliente, idSessao, idSala, qtde, valorTotal } = req.body;
 
-
     if (!idCliente || !idSessao || !idSala || !qtde || !valorTotal) {
-      return res.status(400).json({ erro: 'Dados incompletos para realizar a venda.' });
+      return res
+        .status(400)
+        .json({ erro: "Dados incompletos para realizar a venda." });
     }
 
-
     t = await sequelize.transaction();
-
 
     const sessao = await models.sessoes.findByPk(idSessao);
     if (!sessao) {
       await t.rollback();
-      return res.status(404).json({ erro: 'Sessão não encontrada.' });
+      return res.status(404).json({ erro: "Sessão não encontrada." });
     }
-
 
     if (sessao.assentosDisponiveis < qtde) {
       await t.rollback();
-      return res.status(400).json({ erro: 'Não há assentos disponíveis suficientes.' });
+      return res
+        .status(400)
+        .json({ erro: "Não há assentos disponíveis suficientes." });
     }
 
     await verificarDisponibilidade([idSala], t);
-
 
     const novaVenda = await models.vendas.create(
       {
@@ -67,33 +77,32 @@ async function verificarDisponibilidade(ideSalaArray, transaction) {
         idSala,
         qtde,
         valorTotal,
-        status: 1, 
+        status: STATUS_PENDENTE, // melhor sem número "mágico"
       },
       { transaction: t }
     );
-
 
     await sessao.update(
       { assentosDisponiveis: sessao.assentosDisponiveis - qtde },
       { transaction: t }
     );
 
-
     await t.commit();
 
     return res.status(201).json({
-      mensagem: 'Venda realizada com sucesso!',
+      mensagem: "Venda realizada com sucesso!",
       venda: novaVenda,
     });
   } catch (erroInterno) {
-    if (t) await t.rollback(); 
-    console.error('Erro ao registrar venda:', erroInterno);
+    if (t) await t.rollback();
+    console.error("Erro ao registrar venda:", erroInterno);
     return res.status(500).json({
-      erro: 'Erro ao registrar venda.',
+      erro: "Erro ao registrar venda.",
       detalhes: erroInterno.message,
     });
   }
 };
+
 
 
 
