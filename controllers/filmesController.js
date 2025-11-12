@@ -1,12 +1,11 @@
 
 
+const { where } = require("sequelize");
 const { sequelize, Sequelize } = require("../models/db");
 
 const initModels = require("../models/init-models");
 const models = initModels(sequelize, Sequelize.DataTypes);
 
-const Filme = models.filmes;
-const Genero = models.generos;
 
 
 
@@ -19,7 +18,7 @@ const SECRET = 'APIbilheteria';
 
 exports.adicionarFilme = async (req, res) => {
   console.log(req.body);
-  // adicionando verificação do token
+
   const authHeader = req.headers.authorization;
 
   try {
@@ -38,23 +37,27 @@ exports.adicionarFilme = async (req, res) => {
 
     console.log('gestor:', autenticado);
 
-    // Agora inclui o campo 'idioma'
+
     let { titulo, idGenero, duracao, sinopse, capa, idioma } = req.body;
 
-    // ======= Validação de campos obrigatórios =======
+
     if (!titulo || !idGenero || !duracao || !sinopse || !capa) {
       return res.status(400).send("Faltam campos obrigatórios.");
     }
 
-    // Validação do campo idioma (0 = Legendado, 1 = Dublado)
+    // legendado: 0
+    // dublado: 1
+
+
     if (idioma === undefined || (idioma != 0 && idioma != 1)) {
       return res.status(400).send("O campo 'idioma' é obrigatório e deve ser 0 (Legendado) ou 1 (Dublado).");
     }
 
     // ======= Tratamento de título =======
+
     titulo = titulo.trim().toLowerCase().replace(/\s+/g, " ");
 
-    // Limite de letras
+
     const minLetras = 1;
     const maxLetras = 50;
     if (titulo.length < minLetras) {
@@ -64,13 +67,13 @@ exports.adicionarFilme = async (req, res) => {
       return res.status(400).send(`O título não pode ter mais que ${maxLetras} letras.`);
     }
 
-    // ======= Verificar duplicidade =======
+
     const filmeExistente = await Filme.findOne({ where: { titulo } });
     if (filmeExistente) {
       return res.status(400).send("Filme já cadastrado.");
     }
 
-    // ======= Criar novo filme =======
+
     const novoFilme = await Filme.create({
       titulo,
       idGenero,
@@ -94,10 +97,15 @@ exports.adicionarFilme = async (req, res) => {
 // ======= Listar todos os filmes (TODOS) =======
 
 exports.listarFilmes = async (req, res) => {
+
   try{
 
   const filmes = await models.filmes.findAll({
-  include: [{ model: Genero, as: 'idGenero_genero' }]
+    include: [
+    { 
+      model: models.generos, as: 'idGenero_genero' 
+    }
+  ]
 });
 
     res.json(filmes);
@@ -127,12 +135,14 @@ exports.selecionarIdioma = async (req, res) => {
     });
     console.log('gestor:', autenticado);
 
-    // Validação do idioma
+
+    // valida o idioma em //
+
     if (idioma != 0 && idioma != 1) {
       return res.status(400).send("O idioma deve ser 0 (Legendado) ou 1 (Dublado).");
     }
 
-    // Buscar filmes com o idioma especificado
+
     const filmes = await  models.filmes.findAll({
       where: { idioma },
       include: [{ model: Genero, as: "idGenero_genero", attributes: ["nome"] }]
@@ -171,7 +181,7 @@ exports.buscarFilme = async (req, res) => {
     });
     console.log('gestor:', autenticado);
 
-    const filme = await Filme.findOne({
+    const filme = await filme.findOne({
       where: { titulo },
      include: [{ model: Genero, as: "idGenero_genero", attributes: ["nome"] }]
     });
@@ -246,7 +256,7 @@ exports.atualizarFilme = async (req, res) => {
     });
     console.log('gestor:', autenticado);
 
-    const filme = await Filme.findByPk(id);
+    const filme = await filme.findByPk(id);
     if (!filme) {
       return res.status(404).send("Filme não encontrado.");
     }

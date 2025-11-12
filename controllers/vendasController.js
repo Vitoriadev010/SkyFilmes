@@ -57,6 +57,8 @@ async function verificarDisponibilidade(ideSalaArray, transaction) {
       return res.status(400).json({ erro: 'Não há assentos disponíveis suficientes.' });
     }
 
+    await verificarDisponibilidade([idSala], t);
+
 
     const novaVenda = await models.vendas.create(
       {
@@ -274,10 +276,10 @@ exports.editarVenda = async (req, res) => {
             return res.status(404).json({ erro: 'Venda não encontrada.' });
         }
 
-        // atualizando status
+
         await venda.update({ status });
 
-        // m ostra a atualização da venda toda
+
         return res.status(200).json({
             mensagem: 'Status da venda atualizado com sucesso!',
             venda: {
