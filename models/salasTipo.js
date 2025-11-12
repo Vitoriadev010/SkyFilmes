@@ -22,7 +22,7 @@ module.exports = function(sequelize, DataTypes) {
     }
   }, {
     sequelize,
-    tableName: 'salasTipo',  
+    tableName: 'salasTipo',
     timestamps: false,
     indexes: [
       {
