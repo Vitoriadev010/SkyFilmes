@@ -24,7 +24,7 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false
     },
     duracao: {
-      type: DataTypes.TIME,
+      type: DataTypes.STRING(50),
       allowNull: false
     },
     capa: {

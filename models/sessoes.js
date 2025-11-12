@@ -28,7 +28,7 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false
     },
     hora: {
-      type: DataTypes.TIME,
+      type: DataTypes.STRING(50),
       allowNull: false
     },
     status: {
