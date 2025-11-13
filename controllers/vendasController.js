@@ -77,7 +77,7 @@ exports.realizarvenda = async (req, res) => {
         idSala,
         qtde,
         valorTotal,
-        status: STATUS_PENDENTE, // melhor sem número "mágico"
+        status: STATUS_PENDENTE, 
       },
       { transaction: t }
     );

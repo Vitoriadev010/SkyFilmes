@@ -5,6 +5,7 @@ const { sequelize, Sequelize } = require("../models/db");
 
 const initModels = require("../models/init-models");
 const models = initModels(sequelize, Sequelize.DataTypes);
+const Filme = models.filmes; 
 
 
 
@@ -17,6 +18,7 @@ const SECRET = 'APIbilheteria';
 // ======= Adicionar filmes ao catálogo (ADMIN) =======
 
 exports.adicionarFilme = async (req, res) => {
+
   console.log(req.body);
 
   const authHeader = req.headers.authorization;

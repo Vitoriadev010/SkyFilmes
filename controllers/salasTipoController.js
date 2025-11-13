@@ -4,8 +4,7 @@ const { sequelize, Sequelize } = require("../models/db");
 const initModels = require("../models/init-models");
 const models = initModels(sequelize, Sequelize.DataTypes);
 
-const jwt = require('jsonwebtoken'); // Mantido, conforme código original
-const SECRET = 'APIbilheteria'; // Mantido, conforme código original
+const jwt = require('jsonwebtoken'); 
 
 
 // ======== Adicionar tipo de sala (ADMIN) ========
@@ -100,9 +99,6 @@ exports.atualizarTipoSala = async (req, res) => {
       .json({ error: "Erro ao atualizar tipo de sala." });
   }
 };
-
-
-
 
 // ========== Listar todos os tipo de salas (TODOS) ==========
 
