@@ -1,5 +1,7 @@
 var DataTypes = require("sequelize").DataTypes;
+var _cartaz = require("./cartaz");
 var _clientes = require("./clientes");
+var _em-breve = require("./em-breve");
 var _filmes = require("./filmes");
 var _generos = require("./generos");
 var _gestores = require("./gestores");
@@ -11,7 +13,9 @@ var _vendas = require("./vendas");
 var _vendasItens = require("./vendasItens");
 
 function initModels(sequelize) {
+  var cartaz = _cartaz(sequelize, DataTypes);
   var clientes = _clientes(sequelize, DataTypes);
+  var em-breve = _em-breve(sequelize, DataTypes);
   var filmes = _filmes(sequelize, DataTypes);
   var generos = _generos(sequelize, DataTypes);
   var gestores = _gestores(sequelize, DataTypes);
@@ -24,6 +28,10 @@ function initModels(sequelize) {
 
   vendas.belongsTo(clientes, { as: "idCliente_cliente", foreignKey: "idCliente"});
   clientes.hasMany(vendas, { as: "vendas", foreignKey: "idCliente"});
+  cartaz.belongsTo(filmes, { as: "idFilme_filme", foreignKey: "idFilme"});
+  filmes.hasMany(cartaz, { as: "cartazs", foreignKey: "idFilme"});
+  em-breve.belongsTo(filmes, { as: "idFilme_filme", foreignKey: "idFilme"});
+  filmes.hasMany(em-breve, { as: "em-breves", foreignKey: "idFilme"});
   sessoes.belongsTo(filmes, { as: "idFilme_filme", foreignKey: "idFilme"});
   filmes.hasMany(sessoes, { as: "sessos", foreignKey: "idFilme"});
   filmes.belongsTo(generos, { as: "idGenero_genero", foreignKey: "idGenero"});
@@ -44,7 +52,9 @@ function initModels(sequelize) {
   vendas.hasMany(vendasItens, { as: "vendasItens", foreignKey: "idVenda"});
 
   return {
+    cartaz,
     clientes,
+    em-breve,
     filmes,
     generos,
     gestores,

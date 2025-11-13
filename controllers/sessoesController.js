@@ -350,3 +350,76 @@ exports.detalhesSessao = async (req, res) => {
         console.error('Erro ao obter detalhes da sessão:', error);
     }
 }
+
+
+// buscar sessões pelo id do filme no req params
+exports.sessoesPorFilme = async (req, res) => {
+    const authHeader = req.headers.authorization;
+    const { idFilme } = req.params;
+
+    try {
+        const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
+
+
+        const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
+            if (err) {
+                console.log(err);
+                return res.status(403).json({ erro: 'token inválido ou expirado' });
+            }
+
+            console.log(decoded);
+            return decoded;
+        });
+
+        console.log('cliente:', autenticado);
+
+
+        const sessoesDoFilme = await models.sessoes.findAll({
+            where: {
+                idFilme: idFilme,
+                status: 1
+            }, include: [
+                {
+                    model: models.filmes,
+                    as: 'idFilme_filme',
+                    attributes: [
+                        'titulo',
+                        'duracao',
+                        'idioma',
+                        'capa',
+                        'sinopse'
+                    ],
+                    include: [
+                        {
+                            model: models.generos,
+                            as: 'idGenero_genero',
+                            attributes: [
+                                'nome',
+                                'classificacao'
+                            ]
+                        }
+                    ]
+                },
+                {
+                    model: models.salas,
+                    as: 'idSala_sala',
+                    attributes: [
+                        'numero'
+                    ]
+                },
+                {
+                    model: models.salasTipo,
+                    as: 'idSalasTipo_salasTipo',
+                    attributes: [
+                        'tipo',
+                        'valor'
+                    ]
+                }
+            ]
+        });
+
+        res.status(200).json(sessoesDoFilme);
+    } catch (error) {
+        console.error('Erro ao buscar sessões pelo filme:', error);
+    }
+}
