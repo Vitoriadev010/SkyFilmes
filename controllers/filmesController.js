@@ -5,10 +5,9 @@ const { sequelize, Sequelize } = require("../models/db");
 
 const initModels = require("../models/init-models");
 const models = initModels(sequelize, Sequelize.DataTypes);
-const Filme = models.filmes; 
+const Filme = models.filmes;
 
 
-// status situação: 1 - cartaz; 2 - em breve; 3- desativo
 
 // token
 const jwt = require('jsonwebtoken');
@@ -102,15 +101,15 @@ exports.adicionarFilme = async (req, res) => {
 
 exports.listarFilmes = async (req, res) => {
 
-  try{
+  try {
 
-  const filmes = await models.filmes.findAll({
-    include: [
-    { 
-      model: models.generos, as: 'idGenero_genero' 
-    }
-  ]
-});
+    const filmes = await models.filmes.findAll({
+      include: [
+        {
+          model: models.generos, as: 'idGenero_genero'
+        }
+      ]
+    });
     res.json(filmes);
   } catch (error) {
     console.error("Erro ao listar filmes:", error);
@@ -121,15 +120,18 @@ exports.listarFilmes = async (req, res) => {
 
 
 // listar filmes por status //
+// status situação: 1 - cartaz; 2 - em breve; 3- desativo
 
-exports.listarstatussituacao = async (req, res) => {
+exports.listarStatusCartaz = async (req, res) => {
   try {
-    const { statusSituacao } = req.params; // pega o valor da URL
+    // const { statusSituacao } = req.params; // pega o valor da URL
+
 
     const filmes = await models.filmes.findAll({
-      where: { statusSituacao },
+      where: { statusSituacao: 1 },
+      attributes: ['titulo', 'sinopse', 'duracao', 'capa', 'trailler', 'idioma'],
       include: [
-        { 
+        {
           model: models.generos,
           as: 'idGenero_genero'
         }
@@ -143,6 +145,61 @@ exports.listarstatussituacao = async (req, res) => {
   }
 };
 
+// criar sessão em brem de acordo com os filmes que estão com status 2 
+
+exports.criarSessaoEmBreve = async (req, res) => {
+  const authHeader = req.headers.authorization;
+
+  const { idFilme, dataLacamento } = req.body;
+
+  try {
+    const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
+
+
+    const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
+      if (err) {
+        console.log(err);
+        return res.status(403).json({ erro: 'token inválido ou expirado' });
+      }
+
+      console.log(decoded);
+      return decoded;
+    });
+    console.log('gestor:', autenticado);
+
+    if (!idFilme || !dataLacamento) {
+      res.status(400).json({
+        erro: 'idFilme e dataLancamento são obrigatórios'
+      });
+    };
+
+    const filme = await models.filmes.findOne({
+      where: { idFilme }
+    });
+
+    if (!filme) {
+      return res.status(404).json({ erro: "Filme não encontrado." });
+    }
+
+    if (filme.statusSituacao !== 2) {
+      return res.status(400).json({
+        erro: "Este filme não está com status 2 (em breve)."
+      });
+    }
+
+    const novoRegistro = await models.emBreve.create({
+      idFilme,
+      dataLacamento: dataLacamento
+    });
+
+    return res.status(201).json({
+      mensagem: "Sessão 'em breve' criada com sucesso!",
+      registro: novoRegistro
+    });
+  } catch (error) {
+    console.error("erro ao criar:", error);
+  }
+}
 
 // ======= Selecionar filmes por idioma (CLIENTE) =======
 
@@ -173,7 +230,7 @@ exports.selecionarIdioma = async (req, res) => {
     }
 
 
-    const filmes = await  models.filmes.findAll({
+    const filmes = await models.filmes.findAll({
       where: { idioma },
       include: [{ model: Genero, as: "idGenero_genero", attributes: ["nome"] }]
     });
@@ -213,7 +270,7 @@ exports.buscarFilme = async (req, res) => {
 
     const filme = await filme.findOne({
       where: { titulo },
-     include: [{ model: Genero, as: "idGenero_genero", attributes: ["nome"] }]
+      include: [{ model: Genero, as: "idGenero_genero", attributes: ["nome"] }]
     });
 
     if (!filme) {
@@ -248,7 +305,7 @@ exports.listargenerosFilmes = async (req, res) => {
     });
     console.log('gestor:', autenticado);
 
-    const filmes = await  models.filmes.findAll({
+    const filmes = await models.filmes.findAll({
       where: { id_genero },
       include: [{ model: Genero, as: "idGenero_genero", attributes: ["nome"] }]
     });
@@ -268,7 +325,7 @@ exports.listargenerosFilmes = async (req, res) => {
 
 exports.atualizarFilme = async (req, res) => {
   const { id } = req.params;
-  const { titulo, id_genero, classificacao, duracao, sinopse, capa, idioma, status, statusSituacao} = req.body;
+  const { titulo, id_genero, classificacao, duracao, sinopse, capa, idioma, status, statusSituacao } = req.body;
   const authHeader = req.headers.authorization;
 
   try {
@@ -306,9 +363,9 @@ exports.atualizarFilme = async (req, res) => {
     if (status !== undefined && ![0, 1].includes(status)) {
       return res.status(400).send("Status inválido. Use 0 para inativo e 1 para ativo.");
     } // em vez de deletar, apenas atualizar status
-     if (statusSituacao !== undefined && ![0, 1].includes(statusSituacao)) {
-      return res.status(400).send("Status inválido. Use 1 para cartaz, 2 para em breve e 3 para indisponivel!.");    filme.statusSituacao = statusSituacao;
-     }
+    if (statusSituacao !== undefined && ![0, 1].includes(statusSituacao)) {
+      return res.status(400).send("Status inválido. Use 1 para cartaz, 2 para em breve e 3 para indisponivel!."); filme.statusSituacao = statusSituacao;
+    }
     await filme.save();
 
     res.status(200).json({ message: "Filme atualizado com sucesso!", filme });
