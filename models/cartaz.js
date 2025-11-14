@@ -12,6 +12,11 @@ module.exports = function(sequelize, DataTypes) {
         model: 'filmes',
         key: 'idFilme'
       }
+    },
+    status: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 1
     }
   }, {
     sequelize,
