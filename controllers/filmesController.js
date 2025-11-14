@@ -15,7 +15,8 @@ const jwt = require('jsonwebtoken');
 
 const SECRET = 'APIbilheteria';
 
-// ======= Adicionar filmes ao catálogo (ADMIN) =======
+
+// adicionar filme ADMIN //
 
 exports.adicionarFilme = async (req, res) => {
 
