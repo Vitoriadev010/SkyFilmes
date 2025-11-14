@@ -35,7 +35,7 @@ exports.cadastrarCliente = async (req, res) => {
         const clienteExistente = await clientes.findOne({
             where: {
                 email: email,
-                cpf: cpf
+                cpf  : cpf
             }
         });
 

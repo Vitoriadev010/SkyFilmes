@@ -15,7 +15,7 @@ module.exports = function(sequelize, DataTypes) {
         key: 'idFilme'
       }
     },
-    'data-lacamento': {
+    dataLacamento: {
       type: DataTypes.STRING(50),
       allowNull: false
     },
