@@ -31,6 +31,11 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING(500),
       allowNull: false
     },
+    trailler: {
+      type: DataTypes.STRING(500),
+      allowNull: false,
+      comment: "link"
+    },
     idioma: {
       type: DataTypes.STRING(1),
       allowNull: false
