@@ -29,6 +29,7 @@ const sessoesClientRoutes = require("./routes/sessoesClientRoutes");
 
 
 
+
 app.use(express.json());
 app.use('/salas', salasRoutes);
 app.use('/filmes', FilmesRoutes);
