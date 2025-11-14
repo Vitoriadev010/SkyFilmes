@@ -47,6 +47,11 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 1
+    },
+    statusSituacao: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      comment: "1 - cartaz \r\n2 - em breve \r\n3 - desativo"
     }
   }, {
     sequelize,

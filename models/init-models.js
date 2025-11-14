@@ -1,5 +1,6 @@
 var DataTypes = require("sequelize").DataTypes;
 var _clientes = require("./clientes");
+var _emBreve = require("./emBreve");
 var _filmes = require("./filmes");
 var _generos = require("./generos");
 var _gestores = require("./gestores");
@@ -12,6 +13,7 @@ var _vendasItens = require("./vendasItens");
 
 function initModels(sequelize) {
   var clientes = _clientes(sequelize, DataTypes);
+  var emBreve = _emBreve(sequelize, DataTypes);
   var filmes = _filmes(sequelize, DataTypes);
   var generos = _generos(sequelize, DataTypes);
   var gestores = _gestores(sequelize, DataTypes);
@@ -24,6 +26,8 @@ function initModels(sequelize) {
 
   vendas.belongsTo(clientes, { as: "idCliente_cliente", foreignKey: "idCliente"});
   clientes.hasMany(vendas, { as: "vendas", foreignKey: "idCliente"});
+  emBreve.belongsTo(filmes, { as: "idFilme_filme", foreignKey: "idFilme"});
+  filmes.hasMany(emBreve, { as: "emBreves", foreignKey: "idFilme"});
   sessoes.belongsTo(filmes, { as: "idFilme_filme", foreignKey: "idFilme"});
   filmes.hasMany(sessoes, { as: "sessos", foreignKey: "idFilme"});
   filmes.belongsTo(generos, { as: "idGenero_genero", foreignKey: "idGenero"});
@@ -45,6 +49,7 @@ function initModels(sequelize) {
 
   return {
     clientes,
+    emBreve,
     filmes,
     generos,
     gestores,
