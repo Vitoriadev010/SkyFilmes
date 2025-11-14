@@ -15,14 +15,6 @@ module.exports = function(sequelize, DataTypes) {
         key: 'idGenero'
       }
     },
-    Cartaz: {
-      type: DataTypes.STRING(255),
-      allowNull: false
-    },
-    Em_breve:{
-      type: DataTypes.STRING(255),
-      allowNull: false
-    },
     titulo: {
       type: DataTypes.STRING(500),
       allowNull: false
@@ -76,5 +68,3 @@ module.exports = function(sequelize, DataTypes) {
     ]
   });
 };
-
-
