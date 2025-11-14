@@ -8,14 +8,15 @@ const models = initModels(sequelize, Sequelize.DataTypes);
 const Filme = models.filmes; 
 
 
-
+// status situação: 1 - cartaz; 2 - em breve; 3- desativo
 
 // token
 const jwt = require('jsonwebtoken');
 
 const SECRET = 'APIbilheteria';
 
-// ======= Adicionar filmes ao catálogo (ADMIN) =======
+
+// adicionar filme ADMIN //
 
 exports.adicionarFilme = async (req, res) => {
 
@@ -40,10 +41,10 @@ exports.adicionarFilme = async (req, res) => {
     console.log('gestor:', autenticado);
 
 
-    let { titulo, idGenero, duracao, sinopse, capa, idioma } = req.body;
+    let { titulo, idGenero, duracao, sinopse, capa, idioma, statusSituacao } = req.body;
 
 
-    if (!titulo || !idGenero || !duracao || !sinopse || !capa) {
+    if (!titulo || !idGenero || !duracao || !sinopse || !capa || !statusSituacao) {
       return res.status(400).send("Faltam campos obrigatórios.");
     }
 
@@ -82,7 +83,8 @@ exports.adicionarFilme = async (req, res) => {
       duracao,
       sinopse,
       capa,
-      idioma
+      idioma,
+      statusSituacao
     });
 
     return res.status(201).json({
@@ -109,13 +111,39 @@ exports.listarFilmes = async (req, res) => {
     }
   ]
 });
-
     res.json(filmes);
   } catch (error) {
     console.error("Erro ao listar filmes:", error);
     res.status(500).send("Erro ao listar os filmes.");
   }
 };
+
+
+
+// listar filmes por status //
+
+exports.listarstatussituacao = async (req, res) => {
+  try {
+    const { statusSituacao } = req.params; // pega o valor da URL
+
+    const filmes = await models.filmes.findAll({
+      where: { statusSituacao },
+      include: [
+        { 
+          model: models.generos,
+          as: 'idGenero_genero'
+        }
+      ]
+    });
+
+    res.json(filmes);
+  } catch (error) {
+    console.error("Erro ao listar filmes por status:", error);
+    res.status(500).send("Erro ao listar os filmes.");
+  }
+};
+
+
 // ======= Selecionar filmes por idioma (CLIENTE) =======
 
 exports.selecionarIdioma = async (req, res) => {
@@ -240,7 +268,7 @@ exports.listargenerosFilmes = async (req, res) => {
 
 exports.atualizarFilme = async (req, res) => {
   const { id } = req.params;
-  const { titulo, id_genero, classificacao, duracao, sinopse, capa, idioma, status} = req.body;
+  const { titulo, id_genero, classificacao, duracao, sinopse, capa, idioma, status, statusSituacao} = req.body;
   const authHeader = req.headers.authorization;
 
   try {
@@ -278,8 +306,9 @@ exports.atualizarFilme = async (req, res) => {
     if (status !== undefined && ![0, 1].includes(status)) {
       return res.status(400).send("Status inválido. Use 0 para inativo e 1 para ativo.");
     } // em vez de deletar, apenas atualizar status
-    filme.status = status;
-
+     if (statusSituacao !== undefined && ![0, 1].includes(statusSituacao)) {
+      return res.status(400).send("Status inválido. Use 1 para cartaz, 2 para em breve e 3 para indisponivel!.");    filme.statusSituacao = statusSituacao;
+     }
     await filme.save();
 
     res.status(200).json({ message: "Filme atualizado com sucesso!", filme });

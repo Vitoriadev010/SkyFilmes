@@ -10,6 +10,7 @@ const { autenticarTokenCliente, autenticarTokenGestor } = require("../service/to
 
 
 router.get("/listarfilmes", filmesController.listarFilmes); // todos
+router.get("/listarstatussituacao", filmesController.listarstatussituacao); // todos
 router.patch("/:id", autenticarTokenGestor, filmesController.atualizarFilme); // admin
 router.post("/adicionarfilme", autenticarTokenGestor, filmesController.adicionarFilme); // admin
 router.get("/filme/:titulo", autenticarTokenCliente, autenticarTokenGestor, filmesController.buscarFilme); //todos
