@@ -9,18 +9,22 @@ const filmesController = require("../controllers/filmesController");
 const { autenticarTokenCliente, autenticarTokenGestor } = require("../service/token");
 
 
-router.get("/listarfilmes", filmesController.listarFilmes); // todos
-<<<<<<< HEAD
-router.get("listarstatussituacao", filmesController.listarstatussituacao); // todos
-=======
-router.get("/cartaz", filmesController.listarStatusCartaz); // todos
->>>>>>> 3d6696e319005202bd505fb3afd7ba0f9f838aca
+// lsem token  // 
+router.get("/listarfilmes", filmesController.listarFilmes); 
+router.get("/cartaz", filmesController.listarStatusCartaz); 
+
+// gestor // 
 router.patch("/:id", autenticarTokenGestor, filmesController.atualizarFilme); // admin
 router.post("/adicionarfilme", autenticarTokenGestor, filmesController.adicionarFilme); // admin
 router.post("/criarSessaoEmBreve", autenticarTokenGestor, filmesController.criarSessaoEmBreve); //admin
-router.get("/filme/:titulo", autenticarTokenCliente, autenticarTokenGestor, filmesController.buscarFilme); //todos
-router.get("/filme/:id_genero", autenticarTokenCliente, autenticarTokenGestor, filmesController.listargenerosFilmes); // todos
-router.get("/selecionarIdioma/:idioma", autenticarTokenCliente, autenticarTokenGestor, filmesController.selecionarIdioma); // todos
+router.get("/filme/:titulo", autenticarTokenGestor, filmesController.buscarFilme); //todos
+router.get("/filme/:id_genero", autenticarTokenGestor, filmesController.listargenerosFilmes); // todos
+router.get("/selecionarIdioma/:idioma", autenticarTokenGestor, filmesController.selecionarIdioma); // todos
+
+// cliente // 
+router.get("/filme/:titulo", autenticarTokenCliente, filmesController.buscarFilme); //todos
+router.get("/filme/:id_genero", autenticarTokenCliente, filmesController.listargenerosFilmes); // todos
+router.get("/selecionarIdioma/:idioma", autenticarTokenCliente,filmesController.selecionarIdioma); // todos
 
 
 

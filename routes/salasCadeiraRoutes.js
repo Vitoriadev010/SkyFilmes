@@ -9,11 +9,18 @@ const salasCadeiraController = require("../controllers/salasCadeiraController");
 const { autenticarTokenGestor, autenticarTokenCliente } = require("../service/token");
 
 
-router.get("/listarcadeiras", autenticarTokenGestor, autenticarTokenCliente, salasCadeiraController.listarCadeiras); // todos
-router.get("/cadeiraativa", autenticarTokenCliente, autenticarTokenGestor, salasCadeiraController.cadeiraAtiva); // todos
-router.post("/adicionarcadeira", autenticarTokenGestor, autenticarTokenCliente, salasCadeiraController.adicionarCadeira); // admin
-router.get("/listarcadeiras/:idSala", autenticarTokenGestor, autenticarTokenCliente, salasCadeiraController.listarCadeiraId); // todos
-router.patch("/atualizarcadeira/:id", autenticarTokenGestor, autenticarTokenCliente, salasCadeiraController.atualizarCadeira); // admin
+// cliente // 
+router.get("/listarcadeiras", autenticarTokenCliente, salasCadeiraController.listarCadeiras); // todos
+router.get("/cadeiraativa", autenticarTokenCliente, salasCadeiraController.cadeiraAtiva); // todos
+router.get("/listarcadeiras/:idSala", autenticarTokenCliente, salasCadeiraController.listarCadeiraId); // todos
+
+// gestor // 
+
+router.get("/listarcadeiras", autenticarTokenGestor, salasCadeiraController.listarCadeiras); // todos
+router.get("/cadeiraativa",  autenticarTokenGestor, salasCadeiraController.cadeiraAtiva); // todos
+router.post("/adicionarcadeira", autenticarTokenGestor, salasCadeiraController.adicionarCadeira); // admin
+router.get("/listarcadeiras/:idSala", autenticarTokenGestor, salasCadeiraController.listarCadeiraId); // todos
+router.patch("/atualizarcadeira/:id", autenticarTokenGestor, salasCadeiraController.atualizarCadeira); // admin
 
 
 module.exports = router;
