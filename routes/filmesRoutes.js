@@ -14,10 +14,6 @@ router.get("/listarfilmes", filmesController.listarFilmes);
 router.get("/cartaz", filmesController.listarStatusCartaz);
 
 // gestor // 
-router.get("/listarfilmes", filmesController.listarFilmes); // todos
-router.get("listarstatussituacao", filmesController.listarStatusCartaz); // todos
-router.get("/listaFilmesEmBreve", filmesController.filmesEmBreve); //todos
-router.get("/cartaz", filmesController.listarStatusCartaz); // todos
 router.patch("/:id", autenticarTokenGestor, filmesController.atualizarFilme); // admin
 router.post("/adicionarfilme", autenticarTokenGestor, filmesController.adicionarFilme); // admin
 router.post("/criarSessaoEmBreve", autenticarTokenGestor, filmesController.criarSessaoEmBreve); //admin
