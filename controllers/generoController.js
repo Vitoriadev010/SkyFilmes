@@ -1,17 +1,9 @@
-<<<<<<< HEAD
 const { sequelize, Sequelize } = require("../models/db");
 
 // Inicializa os models corretamente
 const Filme = require("../models/filmes")(sequelize, Sequelize.DataTypes);
 const Genero = require("../models/generos")(sequelize, Sequelize.DataTypes);
 
-=======
-
-const { sequelize, Sequelize } = require(
-  "../models/db");
-const Filme = require("../models/filmes")(sequelize, Sequelize.DataTypes);
-const Genero = require("../models/generos");
->>>>>>> origin
 
 //  ======= Adicionar genero ao catalogo (ADMIN) ========
 
@@ -21,7 +13,6 @@ exports.adicionarGenero = async (req, res) => {
     try {
         let { nome, classificacao } = req.body;
 
-<<<<<<< HEAD
         if (!nome || !classificacao) {
             return res.status(400).send("Faltam campos obrigatorios.");
         }
@@ -140,9 +131,3 @@ exports.GeneroAtivo = async (req, res) => {
     res.status(500).json({ erro: "Erro ao buscar gêneros ativos." });
   }
 };
-=======
-        if (!nome || !classificao)
-    }
-}
-
->>>>>>> origin
