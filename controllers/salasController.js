@@ -146,3 +146,18 @@ exports.atualizarSala = async (req, res) => {
     return res.status(500).send("Erro ao atualizar a sala.");
   }
 };
+
+exports.salasAtiva = async (req, res) => {
+    try {
+    const salasAtivos = await models.salas.findAll({
+      where: { status: 1 }
+    });
+
+    res.status(200).json(salasAtivos);
+
+  } catch (error) {
+    console.error("Erro ao listar salas ativas:", error);
+    res.status(500).json({ erro: "Erro ao buscar salas ativas." });
+  }
+};
+

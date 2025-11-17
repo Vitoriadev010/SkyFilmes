@@ -11,6 +11,7 @@ router.patch("/:id", autenticarTokenGestor, salasController.atualizarSala); // a
 router.post("/adicionarsala", autenticarTokenGestor, salasController.adicionarSala); // admin
 router.get("/:id", autenticarTokenCliente, autenticarTokenCliente, salasController.ListarSalaPorID); // todos
 router.get("/listarsalas", autenticarTokenCliente, autenticarTokenGestor, salasController.listarSalas); // todos
+router.get("/salaativa", autenticarTokenCliente, autenticarTokenGestor, salasController.salasAtiva);
 
 
 module.exports = router;

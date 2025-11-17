@@ -192,5 +192,21 @@ exports.atualizarCadeira = async (req, res) => {
     }
 }
 
+exports.cadeiraAtiva = async (req, res) => {
+  try {
+    const cadeiraAtivos = await models.salasCadeira.findAll({
+      where: { status: 1 }
+    });
+
+    res.status(200).json(cadeiraAtivos);
+
+  } catch (error) {
+    console.error("Erro ao listar cadeira(s) ativas:", error);
+    res.status(500).json({ erro: "Erro ao buscar cadeira(s) ativas." });
+  }
+};
+
+
+
 
 

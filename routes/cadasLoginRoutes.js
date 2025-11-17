@@ -19,7 +19,11 @@ router.post("/cadastrarCliente", clienteController.cadastrarCliente);
 // // gestor cadastra-se e loga-se //
 router.post("/logarGestor", gestorController.logarGestor);
 router.post("/cadastrarGestor", gestorController.cadastrarGestor);
+
+// gestor ver clientes //
+
 router.get("/listarClientes", autenticarTokenGestor, clienteController.listarClientes);
+router.get("/clienteativo", autenticarTokenGestor, clienteController.ClienteAtivo);
 
 module.exports = router;
 

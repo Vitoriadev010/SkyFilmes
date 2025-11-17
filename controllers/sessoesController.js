@@ -423,3 +423,17 @@ exports.sessoesPorFilme = async (req, res) => {
         console.error('Erro ao buscar sessões pelo filme:', error);
     }
 }
+
+exports.sessaoAtivo = async (req, res) => {
+      try {
+    const sessaoAtivos = await models.sessoes.findAll({
+      where: { status: 1 }
+    });
+
+    res.status(200).json(sessaoAtivos);
+
+  } catch (error) {
+    console.error("Erro ao listar sessões ativas:", error);
+    res.status(500).json({ erro: "Erro ao buscar sessões ativas." });
+  }
+};
