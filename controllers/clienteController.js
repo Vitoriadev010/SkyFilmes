@@ -1,5 +1,10 @@
+// const { sequelize, Sequelize } = require("../models/db");
+// const clientes = require("../models/clientes")(sequelize, Sequelize.DataTypes);
+
+
 const { sequelize, Sequelize } = require("../models/db");
-const clientes = require("../models/clientes")(sequelize, Sequelize.DataTypes);
+const initModels = require("../models/init-models");
+const models = initModels(sequelize);
 
 
 // token
@@ -118,3 +123,20 @@ exports.listarClientes = async (req, res) => {
         console.error('Erro ao buscar clientes:', error);
     }
 }
+
+// listar todos os clientes com status ativo //
+
+exports.ClienteAtivo = async (req, res) => {
+  try {
+    const clientesAtivos = await models.clientes.findAll({
+      where: { status: 1 }
+    });
+
+    res.status(200).json(clientesAtivos);
+
+  } catch (error) {
+    console.error("Erro ao listar clientes ativos:", error);
+    res.status(500).json({ erro: "Erro ao buscar clientes ativos." });
+  }
+};
+

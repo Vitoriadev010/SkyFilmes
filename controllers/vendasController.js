@@ -10,7 +10,7 @@ const SECRET = 'APIbilheteria';
 /// STATUS DE VENDAS
 const STATUS_PENDENTE = 1;
 const STATUS_PAGO = 2;
-const STATUS_FALHADO = 3;
+const STATUS_RECUSADO = 3;
 
 
 
@@ -307,3 +307,52 @@ exports.editarVenda = async (req, res) => {
     }
 };
 
+
+// listar status situção de cada venda // 
+
+exports.listarStatusVendas = async (req, res) => {
+  const { status } = req.params;
+  const authHeader = req.headers.authorization;
+
+  try {
+
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ erro: 'token inválido ou expirado' });
+    }
+
+    const token = authHeader.split(' ')[1];
+     const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
+            if (err) {
+                console.log(err);
+                return res.status(403).json({ erro: 'token inválido ou expirado' });
+            }
+
+            console.log(decoded);
+            return decoded;
+        });
+
+        console.log('gestor:', autenticado);
+if (status != 1 && status != 2 && status != 3) {
+      return res.status(400).send("O status de situação deve ser 1 (pendente), 2 (pago) ou 3 (falhado).");
+    }
+
+
+    const vendas = await  models.vendas.findAll({
+      where: { status },
+    include: [ { model: models.vendasItens, as: "vendasItens" }
+]
+    });
+
+    if (vendas.length === 0) {
+
+        const label = status == 1 ? "pendente" : (status == 2 ? "pago" : "falhado");
+      return res.status(404).send(`Nenhum status encontrado para ${label}.`);
+    }
+
+    res.json(vendas);
+  } catch (error) {
+
+    console.error("Erro ao buscar status de vendas:", error);
+    res.status(500).send("Erro ao buscar status de vendas.");
+  }
+};

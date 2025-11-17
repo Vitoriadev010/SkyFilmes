@@ -13,6 +13,7 @@ router.delete("/:id", autenticarTokenGestor, generoController.deletarGenero); //
 router.post("/adicionarGenero", autenticarTokenGestor, generoController.adicionarGenero); // admin
 router.patch("/atualizargenero/:id", autenticarTokenGestor, generoController.atualizarGenero); // admin
 router.get("/listargeneros", autenticarTokenCliente, autenticarTokenGestor, generoController.listarGeneros); // todos
+router.get("/generoativo", generoController.GeneroAtivo); // todos
 
 
 module.exports = router;

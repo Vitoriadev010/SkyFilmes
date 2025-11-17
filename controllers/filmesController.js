@@ -41,10 +41,10 @@ exports.adicionarFilme = async (req, res) => {
     console.log('gestor:', autenticado);
 
 
-    let { titulo, idGenero, duracao, sinopse, capa, idioma, statusSituacao } = req.body;
+    let { titulo, idGenero, duracao, sinopse, capa, idioma, statusSituacao, trailler } = req.body;
 
 
-    if (!titulo || !idGenero || !duracao || !sinopse || !capa || !statusSituacao) {
+    if (!titulo || !idGenero || !duracao || !sinopse || !capa || !statusSituacao || !trailler) {
       return res.status(400).send("Faltam campos obrigatórios.");
     }
 
@@ -84,7 +84,8 @@ exports.adicionarFilme = async (req, res) => {
       sinopse,
       capa,
       idioma,
-      statusSituacao
+      statusSituacao,
+      trailler
     });
 
     return res.status(201).json({

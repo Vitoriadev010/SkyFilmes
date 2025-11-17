@@ -114,3 +114,20 @@ exports.deletarGenero = async (req,res) => {
     }
 };
 
+
+// ver generos com status ativos //
+
+
+exports.GeneroAtivo = async (req, res) => {
+  try {
+    const generoAtivos = await models.genero.findAll({
+      where: { status: 1 }
+    });
+
+    res.status(200).json(generoAtivos);
+
+  } catch (error) {
+    console.error("Erro ao listar gêneros ativos:", error);
+    res.status(500).json({ erro: "Erro ao buscar gêneros ativos." });
+  }
+};

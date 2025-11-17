@@ -137,3 +137,19 @@ exports.listarTiposSalas = async (req, res) => {
     return res.status(500).json({ error: "Erro ao listar tipos de salas!" });
   }
 };
+
+// listar tipo de salas ativos //
+
+exports.tipoSalaAtivo = async (req, res) => {
+    try {
+    const tipoSalaAtivos = await models.salasTipo.findAll({
+      where: { status: 1 }
+    });
+
+    res.status(200).json(tipoSalaAtivos);
+
+  } catch (error) {
+    console.error("Erro ao listar tipo de salas ativos:", error);
+    res.status(500).json({ erro: "Erro ao buscar tipos de sala ativos." });
+  }
+};
