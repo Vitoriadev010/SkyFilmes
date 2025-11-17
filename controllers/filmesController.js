@@ -146,12 +146,15 @@ exports.listarStatusCartaz = async (req, res) => {
   }
 };
 
-// criar sessão em brem de acordo com os filmes que estão com status 2 
+// criar sessão em breve de acordo com os filmes que estão com status 2 
+
+// função para validar a data de lançamento
+const validarDataEmBreve = require('../service/validarDataEmBreve');
 
 exports.criarSessaoEmBreve = async (req, res) => {
   const authHeader = req.headers.authorization;
 
-  const { idFilme, dataLacamento } = req.body;
+  const { idFilme, dataLancamento } = req.body;
 
   try {
     const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
@@ -168,11 +171,17 @@ exports.criarSessaoEmBreve = async (req, res) => {
     });
     console.log('gestor:', autenticado);
 
-    if (!idFilme || !dataLacamento) {
-      res.status(400).json({
+    if (!idFilme || !dataLancamento) {
+      return res.status(400).json({
         erro: 'idFilme e dataLancamento são obrigatórios'
       });
     };
+
+    const validacaoData = validarDataEmBreve(dataLancamento);
+
+    if (!validacaoData.valido) {
+      return res.status(400).json({ erro: validacaoData.mensagem });
+    }
 
     const filme = await models.filmes.findOne({
       where: { idFilme }
@@ -180,6 +189,16 @@ exports.criarSessaoEmBreve = async (req, res) => {
 
     if (!filme) {
       return res.status(404).json({ erro: "Filme não encontrado." });
+    }
+
+    const existente = await models.emBreve.findOne({
+      where: { idFilme }
+    });
+
+    if (existente) {
+      return res.status(400).json({
+        erro: "Este filme já está cadastrado na seção 'em breve'."
+      });
     }
 
     if (filme.statusSituacao !== 2) {
@@ -190,15 +209,53 @@ exports.criarSessaoEmBreve = async (req, res) => {
 
     const novoRegistro = await models.emBreve.create({
       idFilme,
-      dataLacamento: dataLacamento
+      dataLancamento: dataLancamento
     });
+
+    const registroCompleto = await models.emBreve.findOne({
+      where: {
+        idEmBreve: novoRegistro.idEmBreve
+      },
+      include: [
+        {
+          model: models.filmes,
+          as: 'idFilme_filme'
+        }
+      ]
+    })
 
     return res.status(201).json({
       mensagem: "Sessão 'em breve' criada com sucesso!",
-      registro: novoRegistro
+      registro: registroCompleto
     });
   } catch (error) {
     console.error("erro ao criar:", error);
+  }
+}
+
+// listar filmes que serã lançados em breve
+
+exports.filmesEmBreve = async (req, res) => {
+
+  try {
+    const filmesEmBreve = await models.emBreve.findAll({
+      include: [
+        {
+          model: models.filmes,
+          as: 'idFilme_filme',
+          include: [
+            {
+              model: models.generos,
+              as: 'idGenero_genero'
+            }
+          ]
+        }
+      ]
+    });
+
+    return res.status(201).json(filmesEmBreve);
+  } catch (error) {
+    console.error("erro ao listar:", error);
   }
 }
 
