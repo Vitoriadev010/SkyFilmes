@@ -215,8 +215,12 @@ exports.editarSessao = async (req, res) => {
 
 
 exports.listarSessoes = async (req, res) => {
+
+    const { status } = req.query;
+    // listar sessões por filtro de status, ex: ativo/inativo e ativo e inativo - fazer depois
+
    
-    try{
+try{
         // filtro por status se fornecido na URL, deve chamar : /listarSessoes?status=1 / 0 / 1,0
         const where = {};
         if (status !== undefined) {
