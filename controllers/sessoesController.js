@@ -340,26 +340,8 @@ exports.detalhesSessao = async (req, res) => {
 
 // buscar sessões pelo id do filme no req params
 exports.sessoesPorFilme = async (req, res) => {
-    const authHeader = req.headers.authorization;
     const { idFilme } = req.params;
-
-    try {
-        const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
-
-
-        const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
-            if (err) {
-                console.log(err);
-                return res.status(403).json({ erro: 'token inválido ou expirado' });
-            }
-
-            console.log(decoded);
-            return decoded;
-        });
-
-        console.log('cliente:', autenticado);
-
-
+try{
         const sessoesDoFilme = await models.sessoes.findAll({
             where: {
                 idFilme: idFilme,
