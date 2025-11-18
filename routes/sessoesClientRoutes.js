@@ -19,10 +19,8 @@ router.get("/sessaoativa", sessoesController.sessaoAtivo);
 
 
 // gestor 
-router.get("/detalharSessao", autenticarTokenGestor, sessoesController.detalhesSessao);
-router.get("/sessoesPorFilme/:idFilme", autenticarTokenGestor, sessoesController.sessoesPorFilme);
-router.get("/listarSessoesFuturas", autenticarTokenGestor, sessoesController.listarSessoesFuturas);
-router.get("/sessaoativa", autenticarTokenGestor, sessoesController.sessaoAtivo);
+router.get("/listarSessoesFuturas", sessoesController.listarSessoesFuturas);
 
 
 module.exports = router;
+
