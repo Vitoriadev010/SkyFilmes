@@ -17,8 +17,7 @@ const { corrigirDataSemFuso } = require("../service/formatarData");
 
 // rotas para sessões - gestor //
 router.put("/editarSessao", autenticarTokenGestor, sessoesController.editarSessao);
-router.get("/listarSessoes", autenticarTokenGestor, sessoesController.listarSessoes);
-router.get("/listarSessoes", autenticarTokenGestor, sessoesController.listarSessoes);
+router.get("/listarSessoes", sessoesController.listarSessoes);
 router.post("/criarSessao", autenticarTokenGestor, corrigirDataSemFuso, validarHora, sessoesController.criarSessao);
 
 
