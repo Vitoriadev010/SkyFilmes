@@ -215,26 +215,8 @@ exports.editarSessao = async (req, res) => {
 
 
 exports.listarSessoes = async (req, res) => {
-    const authHeader = req.headers.authorization;
-    const { status } = req.query;
-    // listar sessões por filtro de status, ex: ativo/inativo e ativo e inativo - fazer depois
-
-    try {
-        const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
-
-
-        const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
-            if (err) {
-                console.log(err);
-                return res.status(403).json({ erro: 'token inválido ou expirado' });
-            }
-
-            console.log(decoded);
-            return decoded;
-        });
-
-        console.log('gestor:', autenticado);
-
+   
+    try{
         // filtro por status se fornecido na URL, deve chamar : /listarSessoes?status=1 / 0 / 1,0
         const where = {};
         if (status !== undefined) {
