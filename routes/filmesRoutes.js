@@ -11,6 +11,7 @@ const { autenticarTokenCliente, autenticarTokenGestor } = require("../service/to
 
 // lsem token  // 
 router.get("/listarfilmes", filmesController.listarFilmes);
+router.get("/listasfilmesembreve", filmesController.filmesEmBreve);
 router.get("/cartaz", filmesController.listarStatusCartaz);
 
 // gestor // 
