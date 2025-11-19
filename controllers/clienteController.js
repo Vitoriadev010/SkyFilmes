@@ -72,7 +72,7 @@ exports.logarCliente = async (req, res) => {
     }
 
     try {
-        const userCliente = await clientes.findOne({ where: { email: email } });
+        const userCliente = await models.clientes.findOne({ where: { email: email } });
 
         if (!userCliente) {
             return res.status(401).json({ erro: 'Cliente não encontrado' });

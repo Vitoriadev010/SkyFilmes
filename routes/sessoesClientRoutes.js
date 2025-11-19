@@ -14,6 +14,7 @@ const { autenticarTokenCliente, autenticarTokenGestor } = require("../service/to
 router.get("/detalharSessao",  sessoesController.detalhesSessao);
 router.get("/sessoesPorFilme/:idFilme", sessoesController.sessoesPorFilme);
 router.get("/sessaoativa", sessoesController.sessaoAtivo);
+router.get("/sessao/:idSessao", sessoesController.sessaoId);
 
 
 

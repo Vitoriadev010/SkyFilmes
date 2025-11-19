@@ -405,3 +405,30 @@ exports.sessaoAtivo = async (req, res) => {
     res.status(500).json({ erro: "Erro ao buscar sessões ativas." });
   }
 };
+
+
+// sessao por id //
+
+exports.sessaoId = async (req, res) => {
+    const { idSessao } = req.params; 
+
+    try{ 
+         const sessao = await models.sessoes.findAll({
+                    where: { idSessao: idSessao }
+                });
+        
+                if (!sessao || sessao.length === 0) {
+                    return res.status(404).send("sessoes não encontradas pelo id!");
+                }
+        
+                return res.status(200).json(sessao); 
+            } catch (error) {
+                console.error("erro ao buscar sessao por id: ", error);
+                return res.status(500).json({error: "erro ao buscar sessao por id!"});
+        
+            } 
+        
+
+    }
+
+
