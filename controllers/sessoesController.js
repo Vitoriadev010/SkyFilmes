@@ -414,8 +414,10 @@ exports.sessaoId = async (req, res) => {
 
     try{ 
          const sessao = await models.sessoes.findAll({
-                    where: { idSessao: idSessao },
-                    status: 1
+                    where: { 
+                        idSessao: idSessao,
+                        status: 1
+                    }
                 });
         
                 if (!sessao || sessao.length === 0) {
