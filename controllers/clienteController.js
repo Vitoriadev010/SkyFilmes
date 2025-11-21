@@ -108,7 +108,6 @@ exports.listarClientes = async (req, res) => {
     console.log("Usuário logado:", req.user);
 
     try {
-        console.log('gestor:', autenticado);
 
         const lista = await models.clientes.findAll({
             attributes: ['idCliente', 'nome', 'cpf', 'email', 'senha'],
