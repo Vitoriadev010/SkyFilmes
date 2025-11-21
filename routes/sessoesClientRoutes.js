@@ -1,12 +1,11 @@
 const express = require("express");
 
+
 const router = express.Router();
 
 
+
 const sessoesController = require("../controllers/sessoesController");
-
-
-const { autenticarTokenCliente, autenticarTokenGestor } = require("../service/token");
 
 
 
@@ -15,8 +14,6 @@ router.get("/detalharSessao",  sessoesController.detalhesSessao);
 router.get("/sessoesPorFilme/:idFilme", sessoesController.sessoesPorFilme);
 router.get("/sessaoativa", sessoesController.sessaoAtivo);
 router.get("/sessao/:idSessao", sessoesController.sessaoId);
-
-
 
 
 // gestor 
