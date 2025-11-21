@@ -7,24 +7,8 @@ const SECRET = "APIbilheteria";
 
 // ======== Adicionar sala (ADMIN) =========
 exports.adicionarSala = async (req, res) => {
-  const authHeader = req.headers.authorization;
 
   try {
-    const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
-
-
-    const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
-      if (err) {
-        console.log(err);
-        return res.status(403).json({ erro: 'token inválido ou expirado' });
-      }
-
-      console.log(decoded);
-      return decoded;
-    });
-
-    console.log('gestor:', autenticado);
-
     // CORRIGIDO: Removido 'idFilme' do corpo, pois não existe no model 'salas.js'
     let { idSalasTipo, numero } = req.body;
 
@@ -43,18 +27,10 @@ exports.adicionarSala = async (req, res) => {
 
 // ======= Listar salas (ADMIN) ==========
 exports.listarSalas = async (req, res) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) {
-    return res.status(401).json({ erro: "Token não enviado" });
-  }
+  console.log("Usuário logado:", req.user);
+
 
   try {
-    const token = authHeader.startsWith("Bearer ")
-      ? authHeader.split(" ")[1]
-      : authHeader;
-    const autenticado = jwt.verify(token, SECRET);
-    console.log("gestor:", autenticado);
-
     const todasSalas = await models.salas.findAll();
 
     return res.status(200).json(todasSalas);
@@ -64,7 +40,7 @@ exports.listarSalas = async (req, res) => {
   }
 };
 
-// ======= Listar sala por ID (CLIENTE) ==========
+// ======= Listar sala por ID (CLIENTE) ==========  (D)
 exports.ListarSalaPorID = async (req, res) => {
   const authHeader = req.headers.authorization;
   if (!authHeader) {
@@ -100,18 +76,9 @@ exports.ListarSalaPorID = async (req, res) => {
 
 // ======== Atualizar sala (ADMIN) =========
 exports.atualizarSala = async (req, res) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) {
-    return res.status(401).json({ erro: "Token não enviado" });
-  }
+  console.log("Usuário logado:", req.user);
 
   try {
-    const token = authHeader.startsWith("Bearer ")
-      ? authHeader.split(" ")[1]
-      : authHeader;
-    const autenticado = jwt.verify(token, SECRET);
-    console.log("gestor:", autenticado);
-
     const { id } = req.params;
     const { ideSala, numero, status } = req.body;
 
@@ -148,7 +115,7 @@ exports.atualizarSala = async (req, res) => {
 };
 
 exports.salasAtiva = async (req, res) => {
-    try {
+  try {
     const salasAtivos = await models.salas.findAll({
       where: { status: 1 }
     });

@@ -18,27 +18,11 @@ const SECRET = 'APIbilheteria';
 // adicionar filme ADMIN //
 
 exports.adicionarFilme = async (req, res) => {
+  console.log("Usuário logado:", req.user);
 
   console.log(req.body);
 
-  const authHeader = req.headers.authorization;
-
   try {
-    const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
-
-
-    const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
-      if (err) {
-        console.log(err);
-        return res.status(403).json({ erro: 'token inválido ou expirado' });
-      }
-
-      console.log(decoded);
-      return decoded;
-    });
-
-    console.log('gestor:', autenticado);
-
 
     let { titulo, idGenero, duracao, sinopse, capa, idioma, statusSituacao, trailler } = req.body;
 
@@ -152,24 +136,11 @@ exports.listarStatusCartaz = async (req, res) => {
 const validarDataEmBreve = require('../service/validarDataEmBreve');
 
 exports.criarSessaoEmBreve = async (req, res) => {
-  const authHeader = req.headers.authorization;
+  console.log("Usuário logado:", req.user);
 
   const { idFilme, dataLancamento } = req.body;
 
   try {
-    const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
-
-
-    const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
-      if (err) {
-        console.log(err);
-        return res.status(403).json({ erro: 'token inválido ou expirado' });
-      }
-
-      console.log(decoded);
-      return decoded;
-    });
-    console.log('gestor:', autenticado);
 
     if (!idFilme || !dataLancamento) {
       return res.status(400).json({
@@ -263,23 +234,8 @@ exports.filmesEmBreve = async (req, res) => {
 
 exports.selecionarIdioma = async (req, res) => {
   const { idioma } = req.params;
-  const authHeader = req.headers.authorization;
 
   try {
-    const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
-
-
-    const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
-      if (err) {
-        console.log(err);
-        return res.status(403).json({ erro: 'token inválido ou expirado' });
-      }
-
-      console.log(decoded);
-      return decoded;
-    });
-    console.log('gestor:', autenticado);
-
 
     // valida o idioma em //
 
@@ -309,22 +265,8 @@ exports.selecionarIdioma = async (req, res) => {
 
 exports.buscarFilme = async (req, res) => {
   const titulo = req.params.titulo;
-  const authHeader = req.headers.authorization;
 
   try {
-    const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
-
-
-    const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
-      if (err) {
-        console.log(err);
-        return res.status(403).json({ erro: 'token inválido ou expirado' });
-      }
-
-      console.log(decoded);
-      return decoded;
-    });
-    console.log('gestor:', autenticado);
 
     const filme = await filme.findOne({
       where: { titulo },
@@ -346,22 +288,8 @@ exports.buscarFilme = async (req, res) => {
 
 exports.listargenerosFilmes = async (req, res) => {
   const { id_genero } = req.params;
-  const authHeader = req.headers.authorization;
 
   try {
-    const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
-
-
-    const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
-      if (err) {
-        console.log(err);
-        return res.status(403).json({ erro: 'token inválido ou expirado' });
-      }
-
-      console.log(decoded);
-      return decoded;
-    });
-    console.log('gestor:', autenticado);
 
     const filmes = await models.filmes.findAll({
       where: { id_genero },
@@ -382,24 +310,13 @@ exports.listargenerosFilmes = async (req, res) => {
 // ======= Atualizar filme (ADMIN) =======
 
 exports.atualizarFilme = async (req, res) => {
+  console.log("Usuário logado:", req.user);
+  
   const { id } = req.params;
   const { titulo, id_genero, classificacao, duracao, sinopse, capa, idioma, status, statusSituacao } = req.body;
-  const authHeader = req.headers.authorization;
+
 
   try {
-    const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
-
-
-    const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
-      if (err) {
-        console.log(err);
-        return res.status(403).json({ erro: 'token inválido ou expirado' });
-      }
-
-      console.log(decoded);
-      return decoded;
-    });
-    console.log('gestor:', autenticado);
 
     const filme = await filme.findByPk(id);
     if (!filme) {

@@ -4,71 +4,41 @@ const { sequelize, Sequelize } = require("../models/db");
 const initModels = require("../models/init-models");
 const models = initModels(sequelize, Sequelize.DataTypes);
 
-const jwt = require('jsonwebtoken'); 
+const jwt = require('jsonwebtoken');
 
 
 // ======== Adicionar tipo de sala (ADMIN) ========
 
 exports.adicionarTipoSala = async (req, res) => {
+  console.log("Usuário logado:", req.user);
 
-  // adicionando verificação do token
-    const authHeader = req.headers.authorization;
-  
-    try {
-      const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
-  
-  
-      const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
-        if (err) {
-          console.log(err);
-          return res.status(403).json({ erro: 'token inválido ou expirado' });
-        }
-  
-        console.log(decoded);
-        return decoded;
-      });
-  
-      console.log('gestor:', autenticado);
-
-
-    
-        let { nome } = req.body;
-        if (!nome) {
-            return res.status(400).json({ error: "O campo 'nome' é obrigatório." });
-        }
-        const novoTipoSala = await models.salasTipo.create({
-            tipo: nome, 
-            valor: req.body.valor || 0 
-        });
-
-        return res.status(201).json(novoTipoSala);
-    } catch (error) {
-        console.error("Erro ao adicionar tipo de sala:", error);
-        return res.status(500).json({ error: "Erro ao adicionar tipo de sala" });
+  try {
+    let { nome } = req.body;
+    if (!nome) {
+      return res.status(400).json({ error: "O campo 'nome' é obrigatório." });
     }
+    const novoTipoSala = await models.salasTipo.create({
+      tipo: nome,
+      valor: req.body.valor || 0
+    });
+
+    return res.status(201).json(novoTipoSala);
+  } catch (error) {
+    console.error("Erro ao adicionar tipo de sala:", error);
+    return res.status(500).json({ error: "Erro ao adicionar tipo de sala" });
+  }
 };
 
 // ======== atualizar tipo de sala (ADMIN) =========
 
 exports.atualizarTipoSala = async (req, res) => {
+  console.log("Usuário logado:", req.user);
+
   const { id } = req.params;
   const { nome, status } = req.body;
-  const authHeader = req.headers.authorization;
 
-  try { 
-    const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
 
-    const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
-      if (err) {
-        console.log(err);
-        return res.status(403).json({ erro: 'token inválido ou expirado' });
-      }
-
-      console.log(decoded);
-      return decoded;
-    });
-
-    console.log('gestor:', autenticado);
+  try {
 
     // USANDO models.salasTipo CORRETAMENTE
     const tipoSala = await models.salasTipo.findByPk(id);
@@ -79,7 +49,7 @@ exports.atualizarTipoSala = async (req, res) => {
 
     // ATENÇÃO: Mapeando 'nome' -> 'tipo' e usando 'valor' (se fornecido no body)
     if (nome) tipoSala.tipo = nome;
-     if (status !== undefined) sala.status = status;
+    if (status !== undefined) sala.status = status;
     if (status !== undefined && ![0, 1].includes(status)) {
       return res.status(400).send("Status inválido. Use 0 para inativo e 1 para ativo.");
     } // em vez de deletar, apenas atualizar status
@@ -105,32 +75,10 @@ exports.atualizarTipoSala = async (req, res) => {
 
 exports.listarTiposSalas = async (req, res) => {
 
-  const authHeader = req.headers.authorization;
-  
-    try {
-      // ===== Verificação do token (Mantida conforme seu código original) =====
-      const token = authHeader.startsWith("Bearer ")
-        ? authHeader.split(" ")[1]
-        : authHeader;
-  
-      const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
-        if (err) {
-          console.log(err);
-          return res.status(403).json({ erro: "Token inválido ou expirado." });
-        }
-        console.log(decoded);
-        return decoded;
-      });
-      
-      if(!autenticado) {
-          return; 
-      }
-  
-      console.log("gestor:", autenticado);
-  
 
- 
+  try {
     const tiposSalas = await models.salasTipo.findAll();
+
     return res.status(200).json(tiposSalas);
   } catch (error) {
     console.error("Erro ao listar tipos de salas: ", error);
@@ -141,7 +89,7 @@ exports.listarTiposSalas = async (req, res) => {
 // listar tipo de salas ativos //
 
 exports.tipoSalaAtivo = async (req, res) => {
-    try {
+  try {
     const tipoSalaAtivos = await models.salasTipo.findAll({
       where: { status: 1 }
     });

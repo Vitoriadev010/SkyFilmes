@@ -5,20 +5,21 @@ const router = express.Router();
 const salasController = require("../controllers/salasController");
 
 
-const { autenticarTokenGestor, autenticarTokenCliente } = require("../service/token");
+// chamando a verificação e permissão do token //
+const { autenticar } = require("../service/token");
 
-// cliente
-router.get("/:id", autenticarTokenCliente, salasController.ListarSalaPorID); // todos
-router.get("/listarsalas", autenticarTokenCliente,salasController.listarSalas); // todos
-router.get("/salaativa", autenticarTokenCliente, salasController.salasAtiva);
+const { permitir } = require("../service/permissao");
+
+
+// todos //
+router.get("/:id", salasController.ListarSalaPorID); // todos
+router.get("/listarsalas", salasController.listarSalas); // todos
+router.get("/salaativa", salasController.salasAtiva); // todos
 
 
 // gestor 
-router.patch("/:id", autenticarTokenGestor, salasController.atualizarSala); // admin
-router.post("/adicionarsala", autenticarTokenGestor, salasController.adicionarSala); // admin
-router.get("/:id", autenticarTokenGestor, salasController.ListarSalaPorID); // todos
-router.get("/listarsalas", autenticarTokenGestor, salasController.listarSalas); // todos
-router.get("/salaativa", autenticarTokenGestor, salasController.salasAtiva);
+router.patch("/:id", autenticar, permitir("gestor"), salasController.atualizarSala); // admin
+router.post("/adicionarsala", autenticar, permitir("gestor"), salasController.adicionarSala); // admin
 
 
 module.exports = router;

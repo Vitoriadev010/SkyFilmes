@@ -5,40 +5,16 @@ const { sequelize, Sequelize } = require("../models/db");
 const initModels = require('../models/init-models');
 const models = initModels(sequelize, Sequelize.DataTypes);
 
-// const sessoes = require("../models/sessoes")(sequelize, Sequelize.DataTypes);
-// const filmes = require("../models/filmes")(sequelize, Sequelize.DataTypes);
-// const salas = require("../models/salas")(sequelize, Sequelize.DataTypes);
-// const generos = require("../models/generos")(sequelize, Sequelize.DataTypes);
-// const salasTipo = require("../models/salasTipo")(sequelize, Sequelize.DataTypes);
 
-// token
-const jwt = require('jsonwebtoken');
-
-const SECRET = 'APIbilheteria';
 
 
 exports.criarSessao = async (req, res) => {
+    console.log("Usuário logado:", req.user);
+
     console.log('criando sessao');
-    const authHeader = req.headers.authorization;
     const { idFilme, idSala, idSalasTipo, hora, data } = req.body;
 
     try {
-        const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
-
-
-        const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
-            if (err) {
-                console.log(err);
-                return res.status(403).json({ erro: 'token inválido ou expirado' });
-            }
-
-            console.log(decoded);
-            return decoded;
-        });
-
-        console.log('gestor:', autenticado);
-
-
 
         const sessaoExistente = await models.sessoes.findOne({
             where: {
@@ -155,25 +131,11 @@ exports.criarSessao = async (req, res) => {
 
 
 exports.editarSessao = async (req, res) => {
-    const authHeader = req.headers.authorization;
+    console.log("Usuário logado:", req.user);
+
     const { idSessao, idFilme, idSala, hora, data, status } = req.body;
 
     try {
-        const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
-
-
-        const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
-            if (err) {
-                console.log(err);
-                return res.status(403).json({ erro: 'token inválido ou expirado' });
-            }
-
-            console.log(decoded);
-            return decoded;
-        });
-
-        console.log('gestor:', autenticado);
-
         // Busca a sessão pelo idSessao
         const sessao = await models.sessoes.findByPk(idSessao);
 
@@ -219,8 +181,8 @@ exports.listarSessoes = async (req, res) => {
     const { status } = req.query;
     // listar sessões por filtro de status, ex: ativo/inativo e ativo e inativo - fazer depois
 
-   
-try{
+
+    try {
         // filtro por status se fornecido na URL, deve chamar : /listarSessoes?status=1 / 0 / 1,0
         const where = {};
         if (status !== undefined) {
@@ -245,25 +207,10 @@ try{
 
 // lista sessoes futuras para clientes
 exports.listarSessoesFuturas = async (req, res) => {
-    const authHeader = req.headers.authorization;
+    console.log("Usuário logado:", req.user);
     // listar sessões por filtro de status, apenas ativos(futuras)
 
     try {
-        const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
-
-
-        const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
-            if (err) {
-                console.log(err);
-                return res.status(403).json({ erro: 'token inválido ou expirado' });
-            }
-
-            console.log(decoded);
-            return decoded;
-        });
-
-        console.log('cliente:', autenticado);
-
 
         const listaSessoesFuturas = await models.sessoes.findAll({
             where: {
@@ -292,25 +239,9 @@ exports.listarSessoesFuturas = async (req, res) => {
 
 // mostra detalhes da sessao ao mandar idSessao
 exports.detalhesSessao = async (req, res) => {
-    const authHeader = req.headers.authorization;
     const { titulo } = req.body;
 
     try {
-        const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
-
-
-        const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
-            if (err) {
-                console.log(err);
-                return res.status(403).json({ erro: 'token inválido ou expirado' });
-            }
-
-            console.log(decoded);
-            return decoded;
-        });
-
-        console.log('cliente:', autenticado);
-
         if (!titulo) {
             return res.status(400).json({ erro: 'Título do filme é obrigatório.' });
         }
@@ -341,7 +272,7 @@ exports.detalhesSessao = async (req, res) => {
 // buscar sessões pelo id do filme no req params
 exports.sessoesPorFilme = async (req, res) => {
     const { idFilme } = req.params;
-try{
+    try {
         const sessoesDoFilme = await models.sessoes.findAll({
             where: {
                 idFilme: idFilme,
@@ -393,24 +324,24 @@ try{
 }
 
 exports.sessaoAtivo = async (req, res) => {
-      try {
-    const sessaoAtivos = await models.sessoes.findAll({
-      where: { status: 1 }
-    });
+    try {
+        const sessaoAtivos = await models.sessoes.findAll({
+            where: { status: 1 }
+        });
 
-    res.status(200).json(sessaoAtivos);
+        res.status(200).json(sessaoAtivos);
 
-  } catch (error) {
-    console.error("Erro ao listar sessões ativas:", error);
-    res.status(500).json({ erro: "Erro ao buscar sessões ativas." });
-  }
+    } catch (error) {
+        console.error("Erro ao listar sessões ativas:", error);
+        res.status(500).json({ erro: "Erro ao buscar sessões ativas." });
+    }
 };
 
 
 // sessao por id //
 
 exports.sessaoId = async (req, res) => {
-    const { idSessao } = req.params; 
+    const { idSessao } = req.params;
 
     try{ 
          const sessao = await models.sessoes.findAll({
@@ -433,5 +364,6 @@ exports.sessaoId = async (req, res) => {
         
 
     }
+
 
 

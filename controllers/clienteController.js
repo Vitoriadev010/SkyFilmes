@@ -40,7 +40,7 @@ exports.cadastrarCliente = async (req, res) => {
         const clienteExistente = await clientes.findOne({
             where: {
                 email: email,
-                cpf  : cpf
+                cpf: cpf
             }
         });
 
@@ -65,14 +65,19 @@ exports.cadastrarCliente = async (req, res) => {
 };
 
 exports.logarCliente = async (req, res) => {
-    const { email, senha } = req.body;
+    const { nome, senha } = req.body;
 
-    if (!email || !senha) {
+    if (!nome || !senha) {
         return res.status(400).json({ erro: 'Email e senha são obrigatórios' });
     }
 
     try {
-        const userCliente = await models.clientes.findOne({ where: { email: email } });
+        const userCliente = await models.clientes.findOne({ 
+            where: {
+                 nome: nome,
+                 senha: senha
+                } 
+            });
 
         if (!userCliente) {
             return res.status(401).json({ erro: 'Cliente não encontrado' });
@@ -83,7 +88,11 @@ exports.logarCliente = async (req, res) => {
         }
 
         const token = jwt.sign(
-            { id: userCliente.idCliente, nome: userCliente.nome },
+            {
+                nome: userCliente.nome,
+                senha: userCliente.senha,
+                role: "cliente"
+            },
             SECRET
             // depois colocar tempo de expiração do token
         );
@@ -96,25 +105,12 @@ exports.logarCliente = async (req, res) => {
 
 // listar todos os clientes (ADMIN) //
 exports.listarClientes = async (req, res) => {
-    const authHeader = req.headers.authorization;
+    console.log("Usuário logado:", req.user);
 
     try {
-        const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
-
-
-        const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
-            if (err) {
-                console.log(err);
-                return res.status(403).json({ erro: 'token inválido ou expirado' });
-            }
-
-            console.log(decoded);
-            return decoded;
-        });
-
         console.log('gestor:', autenticado);
 
-        const lista = await clientes.findAll({
+        const lista = await models.clientes.findAll({
             attributes: ['idCliente', 'nome', 'cpf', 'email', 'senha'],
         });
         res.json(lista);
@@ -127,16 +123,18 @@ exports.listarClientes = async (req, res) => {
 // listar todos os clientes com status ativo //
 
 exports.ClienteAtivo = async (req, res) => {
-  try {
-    const clientesAtivos = await models.clientes.findAll({
-      where: { status: 1 }
-    });
+    console.log("Usuário logado:", req.user);
 
-    res.status(200).json(clientesAtivos);
+    try {
+        const clientesAtivos = await models.clientes.findAll({
+            where: { status: 1 }
+        });
 
-  } catch (error) {
-    console.error("Erro ao listar clientes ativos:", error);
-    res.status(500).json({ erro: "Erro ao buscar clientes ativos." });
-  }
+        res.status(200).json(clientesAtivos);
+
+    } catch (error) {
+        console.error("Erro ao listar clientes ativos:", error);
+        res.status(500).json({ erro: "Erro ao buscar clientes ativos." });
+    }
 };
 

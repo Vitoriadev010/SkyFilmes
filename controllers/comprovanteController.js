@@ -16,13 +16,11 @@ module.exports = {
 
   
   async gerarComprovante(req, res) {
+    console.log("Usuário logado:", req.user);
+    
     const { idVenda } = req.params;
 
     try {
-      // valida token
-      const authHeader = req.headers.authorization;
-      const token = authHeader?.split(" ")[1];
-      const cliente = jwt.verify(token, SECRET);
 
       const venda = await models.vendas.findByPk(idVenda, {
         include: [

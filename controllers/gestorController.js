@@ -65,14 +65,19 @@ exports.cadastrarGestor = async (req, res) => {
 }
 
 exports.logarGestor = async (req, res) => {
-    const { email, senha } = req.body;
+    const { senha, nome } = req.body;
 
-    if (!email || !senha) {
+    if (!nome || !senha) {
         return res.status(400).json({ erro: 'Email e senha são obrigatórios' });
     }
 
     try {
-        const userGestor = await gestores.findOne({ where: { email: email } });
+        const userGestor = await gestores.findOne({
+            where: {
+                nome: nome,
+                senha: senha
+            }
+        });
 
         if (!userGestor) {
             return res.status(401).json({ erro: 'Gestor não encontrado' });
@@ -84,8 +89,9 @@ exports.logarGestor = async (req, res) => {
 
         const token = jwt.sign(
             {
-                id: userGestor.idGestor,
-                Gestor: userGestor.nome
+                nome: userGestor.nome,
+                senha: userGestor.senha,
+                role: "gestor"
             },
             SECRET
         )

@@ -19,7 +19,7 @@ const STATUS_RECUSADO = 3;
  * @param {object} transaction - Transação Sequelize.
  * @returns {Promise<void>} - Rejeita se os assentos estiverem ocupados.
  */
-async function verificarDisponibilidade(idSalasCadeiraArray , transaction) {
+async function verificarDisponibilidade(idSalasCadeiraArray, transaction) {
   const assentosOcupados = await models.vendasItens.findAll({
     where: {
       idSalasCadeira: { [Op.in]: idSalasCadeiraArray },
@@ -42,6 +42,8 @@ async function verificarDisponibilidade(idSalasCadeiraArray , transaction) {
 
 
 exports.realizarvenda = async (req, res) => {
+  console.log("Usuário logado:", req.user);
+
   let t;
 
   try {
@@ -77,7 +79,7 @@ exports.realizarvenda = async (req, res) => {
         idSala,
         qtde,
         valorTotal,
-        status: STATUS_PENDENTE, 
+        status: STATUS_PENDENTE,
       },
       { transaction: t }
     );
@@ -107,245 +109,200 @@ exports.realizarvenda = async (req, res) => {
 
 
 exports.vendasPorCLiente = async (req, res) => {
-    console.log('buscando vendas por cliente');
+  console.log("Usuário logado:", req.user);
 
-    const { idCliente } = req.params;
-    const authHeader = req.headers.authorization;
+  console.log('buscando vendas por cliente');
 
-    try {
-        const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
+  const { idCliente } = req.params;
+  const authHeader = req.headers.authorization;
+
+  try {
+    const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
 
 
-        const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
-            if (err) {
-                console.log(err);
-                return res.status(403).json({ erro: 'token inválido ou expirado' });
+    const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
+      if (err) {
+        console.log(err);
+        return res.status(403).json({ erro: 'token inválido ou expirado' });
+      }
+
+      console.log(decoded);
+      return decoded;
+    });
+
+    console.log('cliente:', autenticado);
+
+    console.log('Cliente autenticado:', idCliente);
+    console.log('Buscando vendas do cliente ID:', idCliente);
+
+    // Busca as vendas do cliente com:  sessão, tipo da sala e itens (cadeiras)
+    const vendas = await models.vendas.findAll({
+      where: { idCliente },
+      include: [
+        {
+          model: models.vendasItens,
+          as: 'vendasItens',
+          include: [
+            {
+              model: models.salasCadeira,
+              as: 'idSalasCadeira_salasCadeira',
+              attributes: ['idSalasCadeira', 'fileira', 'coluna', 'numero'],
+              include: [
+                {
+                  model: models.salas,
+                  as: 'idSala_sala',
+                  attributes: ['ideSala', 'numero']
+                }
+              ]
+            }
+          ]
+        },
+        {
+          model: models.sessoes,
+          as: 'idSessao_sesso',
+          attributes: ['idSessao', 'data', 'hora'],
+          include: [
+            {
+              model: models.salas,
+              as: 'idSala_sala',
+              attributes: ['ideSala', 'numero']
+            },
+
+            {
+              model: models.salasTipo,
+              as: 'idSalasTipo_salasTipo',
+              attributes: ['idSalasTipo', 'tipo', 'valor']
             }
 
-            console.log(decoded);
-            return decoded;
-        });
 
-        console.log('cliente:', autenticado);
-
-        console.log('Cliente autenticado:', idCliente);
-        console.log('Buscando vendas do cliente ID:', idCliente);
-
-        // Busca as vendas do cliente com:  sessão, tipo da sala e itens (cadeiras)
-        const vendas = await models.vendas.findAll({
-            where: { idCliente },
-            include: [
-                {
-                    model: models.vendasItens,
-                    as: 'vendasItens',
-                    include: [
-                        {
-                            model: models.salasCadeira,
-                            as: 'idSalasCadeira_salasCadeira',
-                            attributes: ['idSalasCadeira', 'fileira', 'coluna', 'numero'],
-                            include: [
-                                {
-                                    model: models.salas,
-                                    as: 'idSala_sala',
-                                    attributes: ['ideSala', 'numero']
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    model: models.sessoes,
-                    as: 'idSessao_sesso',
-                    attributes: ['idSessao', 'data', 'hora'],
-                    include: [
-                        {
-                            model: models.salas,
-                            as: 'idSala_sala',
-                            attributes: ['ideSala', 'numero']
-                        },
-
-                        {
-                            model: models.salasTipo,
-                            as: 'idSalasTipo_salasTipo',
-                            attributes: ['idSalasTipo', 'tipo', 'valor']
-                        }
-
-
-                    ]
-                },
-                {
-                    model: models.salas,
-                    as: 'idSala_sala',
-                    attributes: ['ideSala', 'numero']
-                }
-            ],
-            order: [['idVenda', 'DESC']]
-        });
-
-        if (!vendas || vendas.length === 0) {
-            return res.status(404).json({ mensagem: 'Nenhuma venda encontrada para este cliente.' });
+          ]
+        },
+        {
+          model: models.salas,
+          as: 'idSala_sala',
+          attributes: ['ideSala', 'numero']
         }
+      ],
+      order: [['idVenda', 'DESC']]
+    });
 
-        // resposta
-        const resposta = vendas.map(venda => ({
-            idVenda: venda.idVenda,
-            valorTotal: venda.valorTotal,
-            qtde: venda.qtde,
-            status: venda.status,
-            sala: venda.idSala_sala ? venda.idSala_sala.numero : null,
-            sessao: venda.idSessao_sesso ? {
-                idSessao: venda.idSessao_sesso.idSessao,
-                data: venda.idSessao_sesso.data,
-                hora: venda.idSessao_sesso.hora,
-                sala: venda.idSessao_sesso.idSala_sala?.numero,
-                tipoSala: venda.idSessao_sesso.idSala_sala?.idSalasTipo_salasTipo?.tipo,
-                valorIngresso: venda.idSessao_sesso.idSala_sala?.idSalasTipo_salasTipo?.valor
-            } : null,
-            cadeiras: venda.vendasItens.map(item => ({
-                id: item.idSalasCadeira_salasCadeira?.idSalasCadeira,
-                fileira: item.idSalasCadeira_salasCadeira?.fileira,
-                coluna: item.idSalasCadeira_salasCadeira?.coluna,
-                numero: item.idSalasCadeira_salasCadeira?.numero,
-                precoUnitario: item.precoUnitario
-            }))
-        }));
-
-        return res.status(200).json({
-            cliente: idCliente,
-            totalVendas: resposta.length,
-            vendas: resposta
-        });
-
-    } catch (error) {
-        console.error('Erro ao buscar vendas por cliente:', error);
-        return res.status(500).json({ erro: 'Erro ao buscar vendas por cliente.' });
+    if (!vendas || vendas.length === 0) {
+      return res.status(404).json({ mensagem: 'Nenhuma venda encontrada para este cliente.' });
     }
+
+    // resposta
+    const resposta = vendas.map(venda => ({
+      idVenda: venda.idVenda,
+      valorTotal: venda.valorTotal,
+      qtde: venda.qtde,
+      status: venda.status,
+      sala: venda.idSala_sala ? venda.idSala_sala.numero : null,
+      sessao: venda.idSessao_sesso ? {
+        idSessao: venda.idSessao_sesso.idSessao,
+        data: venda.idSessao_sesso.data,
+        hora: venda.idSessao_sesso.hora,
+        sala: venda.idSessao_sesso.idSala_sala?.numero,
+        tipoSala: venda.idSessao_sesso.idSala_sala?.idSalasTipo_salasTipo?.tipo,
+        valorIngresso: venda.idSessao_sesso.idSala_sala?.idSalasTipo_salasTipo?.valor
+      } : null,
+      cadeiras: venda.vendasItens.map(item => ({
+        id: item.idSalasCadeira_salasCadeira?.idSalasCadeira,
+        fileira: item.idSalasCadeira_salasCadeira?.fileira,
+        coluna: item.idSalasCadeira_salasCadeira?.coluna,
+        numero: item.idSalasCadeira_salasCadeira?.numero,
+        precoUnitario: item.precoUnitario
+      }))
+    }));
+
+    return res.status(200).json({
+      cliente: idCliente,
+      totalVendas: resposta.length,
+      vendas: resposta
+    });
+
+  } catch (error) {
+    console.error('Erro ao buscar vendas por cliente:', error);
+    return res.status(500).json({ erro: 'Erro ao buscar vendas por cliente.' });
+  }
 };
 
 // LISTAR TODAS AS VENDAS
 
 exports.listarvendas = async (req, res) => {
+  console.log("Usuário logado:", req.user);
 
-    const authHeader = req.headers.authorization;
+  try {
+    const vendas = await models.vendas.findAll();
 
-    try {
-        const token = authHeader.startsWith('Bearer ')
-            ? authHeader.split(' ')[1]
-            : authHeader;
-
-        const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
-            if (err) {
-                return res.status(403).json({ erro: 'Token inválido ou expirado.' });
-            }
-            return decoded;
-        });
-
-        console.log('gestor:', autenticado);
-
-        const vendas = await models.vendas.findAll();
-        res.json(vendas);
-    } catch (error) {
-        console.error("Erro ao listar todas as vendas:", error);
-        res.status(500).send("Erro ao listar todas as vendas.");
-    }
+    res.json(vendas);
+  } catch (error) {
+    console.error("Erro ao listar todas as vendas:", error);
+    res.status(500).send("Erro ao listar todas as vendas.");
+  }
 };
 
 
 exports.editarVenda = async (req, res) => {
-    const authHeader = req.headers.authorization;
-    const { idVenda } = req.params;
-    const { status } = req.body;
+  console.log("Usuário logado:", req.user);
 
-    try {
-        const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
+  const { idVenda } = req.params;
+  const { status } = req.body;
 
+  try {
 
-        const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
-            if (err) {
-                console.log(err);
-                return res.status(403).json({ erro: 'token inválido ou expirado' });
-            }
-
-            console.log(decoded);
-            return decoded;
-        });
-
-        console.log('gestor:', autenticado);
-
-
-
-        if (![1, 2, 3].includes(Number(status))) {
-            return res.status(400).json({
-                erro: 'Status inválido. Use: 1 = pendente, 2 = pago, 3 = recusado.'
-            });
-        }
-
-        const venda = await models.vendas.findByPk(idVenda);
-        if (!venda) {
-            return res.status(404).json({ erro: 'Venda não encontrada.' });
-        }
-
-
-        await venda.update({ status });
-
-
-        return res.status(200).json({
-            mensagem: 'Status da venda atualizado com sucesso!',
-            venda: {
-                idVenda: venda.idVenda,
-                status: venda.status,
-                statusDescricao:
-                    venda.status === 1
-                        ? 'Pendente'
-                        : venda.status === 2
-                            ? 'Pago'
-                            : 'Recusado'
-            }
-        });
-    } catch (error) {
-        console.error('Erro ao editar venda:', error);
+    if (![1, 2, 3].includes(Number(status))) {
+      return res.status(400).json({
+        erro: 'Status inválido. Use: 1 = pendente, 2 = pago, 3 = recusado.'
+      });
     }
+
+    const venda = await models.vendas.findByPk(idVenda);
+    if (!venda) {
+      return res.status(404).json({ erro: 'Venda não encontrada.' });
+    }
+
+
+    await venda.update({ status });
+
+
+    return res.status(200).json({
+      mensagem: 'Status da venda atualizado com sucesso!',
+      venda: {
+        idVenda: venda.idVenda,
+        status: venda.status,
+        statusDescricao:
+          venda.status === 1
+            ? 'Pendente'
+            : venda.status === 2
+              ? 'Pago'
+              : 'Recusado'
+      }
+    });
+  } catch (error) {
+    console.error('Erro ao editar venda:', error);
+  }
 };
 
 
 // listar status situção de cada venda // 
 
 exports.listarStatusVendas = async (req, res) => {
+  console.log("Usuário logado:", req.user);
+
   const { status } = req.params;
-  const authHeader = req.headers.authorization;
+
 
   try {
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ erro: 'token inválido ou expirado' });
-    }
-
-    const token = authHeader.split(' ')[1];
-     const autenticado = jwt.verify(token, SECRET, (err, decoded) => {
-            if (err) {
-                console.log(err);
-                return res.status(403).json({ erro: 'token inválido ou expirado' });
-            }
-
-            console.log(decoded);
-            return decoded;
-        });
-
-        console.log('gestor:', autenticado);
-if (status != 1 && status != 2 && status != 3) {
-      return res.status(400).send("O status de situação deve ser 1 (pendente), 2 (pago) ou 3 (falhado).");
-    }
-
-
-    const vendas = await  models.vendas.findAll({
+    const vendas = await models.vendas.findAll({
       where: { status },
-    include: [ { model: models.vendasItens, as: "vendasItens" }
-]
+      include: [{ model: models.vendasItens, as: "vendasItens" }
+      ]
     });
 
     if (vendas.length === 0) {
 
-        const label = status == 1 ? "pendente" : (status == 2 ? "pago" : "falhado");
+      const label = status == 1 ? "pendente" : (status == 2 ? "pago" : "falhado");
       return res.status(404).send(`Nenhum status encontrado para ${label}.`);
     }
 

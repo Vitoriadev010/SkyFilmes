@@ -9,16 +9,18 @@ const sessoesController = require("../controllers/sessoesController");
 
 const { validarHora } = require("../service/formatarHora");
 
-const { autenticarTokenGestor } = require("../service/token");
-
 const { corrigirDataSemFuso } = require("../service/formatarData");
 
+// chamando a verificação e permissão do token //
+const { autenticar } = require("../service/token");
+
+const { permitir } = require("../service/permissao");
 
 
 // rotas para sessões - gestor //
-router.put("/editarSessao", autenticarTokenGestor, sessoesController.editarSessao);
-router.get("/listarSessoes", sessoesController.listarSessoes);
-router.post("/criarSessao", autenticarTokenGestor, corrigirDataSemFuso, validarHora, sessoesController.criarSessao);
+router.put("/editarSessao", autenticar, permitir("gestor"), sessoesController.editarSessao); //gestor
+router.get("/listarSessoes", autenticar, permitir("gestor"), sessoesController.listarSessoes); //gestor
+router.post("/criarSessao", autenticar, permitir("gestor"), corrigirDataSemFuso, validarHora, sessoesController.criarSessao); //gestor
 
 
 module.exports = router;
