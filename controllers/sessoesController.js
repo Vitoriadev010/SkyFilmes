@@ -9,6 +9,7 @@ const models = initModels(sequelize, Sequelize.DataTypes);
 
 
 exports.criarSessao = async (req, res) => {
+    console.log("Vitoria linda diz: deu certo");
     console.log("Usuário logado:", req.user);
 
     console.log('criando sessao');

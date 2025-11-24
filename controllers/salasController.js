@@ -10,10 +10,9 @@ exports.adicionarSala = async (req, res) => {
 
   try {
     // CORRIGIDO: Removido 'idFilme' do corpo, pois não existe no model 'salas.js'
-    let { idSalasTipo, numero } = req.body;
+    let {  numero } = req.body;
 
     const novaSala = await models.salas.create({
-      idSalasTipo,
       numero
     });
 
@@ -48,7 +47,7 @@ exports.ListarSalaPorID = async (req, res) => {
     const sala = await models.salas.findOne({
       where: { idSala: id },
       include: [
-        { model: models.salasTipo, as: 'ideSala_salasTipo' }
+       
       ]
     });
 
