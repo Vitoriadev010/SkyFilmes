@@ -99,11 +99,11 @@ exports.listarCadeiras = async (req, res) => {
     }
 };
 
-// ========== Listar cadeiras por idSala (TODOS) ==========
+// ========== Listar cadeiras por ideSala (TODOS) ==========
 
 
 exports.listarCadeiraId = async (req, res) => {
-    const { idSala } = req.params;    
+    const { ideSala } = req.params;    
     const authHeader = req.headers.authorization;
     
       try {
@@ -129,7 +129,7 @@ exports.listarCadeiraId = async (req, res) => {
     
    
         const cadeiras = await models.salasCadeira.findAll({
-            where: { idSala: idSala }
+            where: { ideSala: ideSala }
         });
 
         if (!cadeiras || cadeiras.length === 0) {

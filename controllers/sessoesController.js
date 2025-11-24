@@ -13,14 +13,14 @@ exports.criarSessao = async (req, res) => {
     console.log("Usuário logado:", req.user);
 
     console.log('criando sessao');
-    const { idFilme, idSala, idSalasTipo, hora, data } = req.body;
+    const { idFilme, ideSala, ideSalasTipo, hora, data } = req.body;
 
     try {
 
         const sessaoExistente = await models.sessoes.findOne({
             where: {
                 idFilme: idFilme,
-                idSala: idSala,
+                ideSala: ideSala,
                 hora: hora,
                 data: data
             }
@@ -36,8 +36,8 @@ exports.criarSessao = async (req, res) => {
 
         const novaSessao = await models.sessoes.create({
             idFilme: idFilme,
-            idSala: idSala,
-            idSalasTipo: idSalasTipo,
+            ideSala: ideSala,
+            ideSalasTipo: ideSalasTipo,
             hora: hora,
             data: data
         });
@@ -71,7 +71,7 @@ exports.criarSessao = async (req, res) => {
                 },
                 {
                     model: models.salas,
-                    as: 'idSala_sala',
+                    as: 'ideSala_sala',
                     attributes: [
                         'numero'
                     ]
@@ -79,7 +79,7 @@ exports.criarSessao = async (req, res) => {
                     
                         {
                             model: models.salasTipo,
-                            as: 'idSala_salasTipo',
+                            as: 'ideSala_salasTipo',
                             attributes: [
                                 'tipo',
                                 'valor'
@@ -88,7 +88,7 @@ exports.criarSessao = async (req, res) => {
                         },
                 {
                     model: models.salasTipo,
-                    as: 'idSalasTipo_salasTipo',
+                    as: 'ideSalasTipo_salasTipo',
                     attributes: [
                         'tipo',
                         'valor'
@@ -133,7 +133,7 @@ exports.criarSessao = async (req, res) => {
 exports.editarSessao = async (req, res) => {
     console.log("Usuário logado:", req.user);
 
-    const { idSessao, idFilme, idSala, hora, data, status } = req.body;
+    const { idSessao, idFilme, ideSala, hora, data, status } = req.body;
 
     try {
         // Busca a sessão pelo idSessao
@@ -145,7 +145,7 @@ exports.editarSessao = async (req, res) => {
 
         // Atualiza somente os campos que vieram
         if (idFilme !== undefined) sessao.idFilme = idFilme;
-        if (idSala !== undefined) sessao.idSala = idSala;
+        if (ideSala !== undefined) sessao.ideSala = ideSala;
         if (hora !== undefined) sessao.hora = hora;
         if (data !== undefined) sessao.data = data;
         if (status !== undefined) sessao.status = status;
@@ -194,7 +194,7 @@ exports.listarSessoes = async (req, res) => {
             }
         }
         const listaSessoes = await models.sessoes.findAll({
-            attributes: ['idSessao', 'idFilme', 'idSala', 'hora', 'data', 'status'],
+            attributes: ['idSessao', 'idFilme', 'ideSala', 'hora', 'data', 'status'],
             where
         });
 
@@ -226,7 +226,7 @@ exports.listarSessoesFuturas = async (req, res) => {
             ],
             include: [
                 'idFilme_filme',
-                'idSala_sala'
+                'ideSala_sala'
             ]
         });
 
@@ -301,14 +301,14 @@ exports.sessoesPorFilme = async (req, res) => {
                 },
                 {
                     model: models.salas,
-                    as: 'idSala_sala',
+                    as: 'ideSala_sala',
                     attributes: [
                         'numero'
                     ]
                 },
                 {
                     model: models.salasTipo,
-                    as: 'idSalasTipo_salasTipo',
+                    as: 'ideSalasTipo_salasTipo',
                     attributes: [
                         'tipo',
                         'valor'
