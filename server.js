@@ -47,11 +47,12 @@ app.use('/gestorCadLog', gestorCadasLoginRoutes);
 
 
 
+
 app.get('/', (req, res) => {
   res.send('Servidor está funcionando corretamente!');
 })
 
-app.listen(3000, "0.0.0.0", () => {
-  console.log('Vitoria Linda diz: Servidor rodando na porta 3000');
+app.listen(3002, "0.0.0.0", () => {
+  console.log('Vitoria Linda diz: Servidor rodando na porta 3002');
 
 })
