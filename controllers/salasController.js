@@ -69,7 +69,7 @@ exports.atualizarSala = async (req, res) => {
 
   try {
     const { id } = req.params;
-    const { ideSala, numero, status } = req.body;
+    const { idSala, numero, status } = req.body;
 
 
     const sala = await models.salas.findByPk(id);

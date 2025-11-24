@@ -79,7 +79,7 @@ exports.criarSessao = async (req, res) => {
                     
                         {
                             model: models.salasTipo,
-                            as: 'ideSala_salasTipo',
+                            as: 'idSala_salasTipo',
                             attributes: [
                                 'tipo',
                                 'valor'

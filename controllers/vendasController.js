@@ -151,7 +151,7 @@ exports.vendasPorCLiente = async (req, res) => {
                 {
                   model: models.salas,
                   as: 'idSala_sala',
-                  attributes: ['ideSala', 'numero']
+                  attributes: ['idSala', 'numero']
                 }
               ]
             }
@@ -165,7 +165,7 @@ exports.vendasPorCLiente = async (req, res) => {
             {
               model: models.salas,
               as: 'idSala_sala',
-              attributes: ['ideSala', 'numero']
+              attributes: ['idSala', 'numero']
             },
 
             {
@@ -180,7 +180,7 @@ exports.vendasPorCLiente = async (req, res) => {
         {
           model: models.salas,
           as: 'idSala_sala',
-          attributes: ['ideSala', 'numero']
+          attributes: ['idSala', 'numero']
         }
       ],
       order: [['idVenda', 'DESC']]

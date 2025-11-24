@@ -12,7 +12,7 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       references: {
         model: 'salas',
-        key: 'ideSala'
+        key: 'idSala'
       }
     },
     idFilme: {
