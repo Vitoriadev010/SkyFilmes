@@ -42,18 +42,7 @@ exports.listarSalas = async (req, res) => {
 
 // ======= Listar sala por ID (CLIENTE) ==========  (D)
 exports.ListarSalaPorID = async (req, res) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) {
-    return res.status(401).json({ erro: "Token não enviado" });
-  }
-
-  try {
-    const token = authHeader.startsWith("Bearer ")
-      ? authHeader.split(" ")[1]
-      : authHeader;
-    const autenticado = jwt.verify(token, SECRET);
-    console.log("gestor:", autenticado);
-
+  try{
     const { id } = req.params;
 
     const sala = await models.salas.findOne({
