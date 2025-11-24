@@ -13,7 +13,7 @@ exports.criarSessao = async (req, res) => {
     console.log("Usuário logado:", req.user);
 
     console.log('criando sessao');
-    const { idFilme, ideSala, ideSalasTipo, hora, data } = req.body;
+    const { idFilme, ideSala, idSalasTipo, hora, data } = req.body;
 
     try {
 
@@ -37,7 +37,7 @@ exports.criarSessao = async (req, res) => {
         const novaSessao = await models.sessoes.create({
             idFilme: idFilme,
             ideSala: ideSala,
-            ideSalasTipo: ideSalasTipo,
+            idSalasTipo: idSalasTipo,
             hora: hora,
             data: data
         });
@@ -88,7 +88,7 @@ exports.criarSessao = async (req, res) => {
                         },
                 {
                     model: models.salasTipo,
-                    as: 'ideSalasTipo_salasTipo',
+                    as: 'idSalasTipo_salasTipo',
                     attributes: [
                         'tipo',
                         'valor'
@@ -308,7 +308,7 @@ exports.sessoesPorFilme = async (req, res) => {
                 },
                 {
                     model: models.salasTipo,
-                    as: 'ideSalasTipo_salasTipo',
+                    as: 'idSalasTipo_salasTipo',
                     attributes: [
                         'tipo',
                         'valor'

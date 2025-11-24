@@ -170,8 +170,8 @@ exports.vendasPorCLiente = async (req, res) => {
 
             {
               model: models.salasTipo,
-              as: 'ideSalasTipo_salasTipo',
-              attributes: ['ideSalasTipo', 'tipo', 'valor']
+              as: 'idSalasTipo_salasTipo',
+              attributes: ['idSalasTipo', 'tipo', 'valor']
             }
 
 
@@ -202,8 +202,8 @@ exports.vendasPorCLiente = async (req, res) => {
         data: venda.idSessao_sesso.data,
         hora: venda.idSessao_sesso.hora,
         sala: venda.idSessao_sesso.ideSala_sala?.numero,
-        tipoSala: venda.idSessao_sesso.ideSala_sala?.ideSalasTipo_salasTipo?.tipo,
-        valorIngresso: venda.idSessao_sesso.ideSala_sala?.ideSalasTipo_salasTipo?.valor
+        tipoSala: venda.idSessao_sesso.ideSala_sala?.idSalasTipo_salasTipo?.tipo,
+        valorIngresso: venda.idSessao_sesso.ideSala_sala?.idSalasTipo_salasTipo?.valor
       } : null,
       cadeiras: venda.vendasItens.map(item => ({
         id: item.idSalasCadeira_salasCadeira?.idSalasCadeira,
