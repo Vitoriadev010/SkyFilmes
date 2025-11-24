@@ -74,6 +74,7 @@ exports.ListarSalaPorID = async (req, res) => {
   }
 };
 
+
 // ======== Atualizar sala (ADMIN) =========
 exports.atualizarSala = async (req, res) => {
   console.log("Usuário logado:", req.user);
@@ -113,6 +114,8 @@ exports.atualizarSala = async (req, res) => {
     return res.status(500).send("Erro ao atualizar a sala.");
   }
 };
+
+
 
 exports.salasAtiva = async (req, res) => {
   try {

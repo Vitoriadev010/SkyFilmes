@@ -20,10 +20,8 @@ router.get("/generoativo", generoController.GeneroAtivo); // todos
 router.get("/listargeneros", generoController.listarGeneros); // todos
 
 // gestor // 
-router.delete("/:id", autenticar, permitir("gestor"), generoController.deletarGenero); // admin
 router.post("/adicionarGenero", autenticar, permitir("gestor"), generoController.adicionarGenero); // admin
 router.patch("/atualizargenero/:id", autenticar, permitir("gestor"), generoController.atualizarGenero); // admin
-router.get("/listargeneros", autenticar, permitir("gestor"), generoController.listarGeneros); // todos
 
 
 module.exports = router;

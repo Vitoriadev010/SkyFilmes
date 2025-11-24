@@ -50,7 +50,7 @@ exports.atualizarGenero = async (req, res) => {
   
   try {
     const { id } = req.params;
-    const { nome, classificacao } = req.body;
+    const { nome, classificacao, status } = req.body;
 
 
     const { Genero } = require("../models/generos"); // ajusta o nome do model se for diferente
@@ -61,9 +61,11 @@ exports.atualizarGenero = async (req, res) => {
       return res.status(404).json({ erro: "Gênero não encontrado!" });
     }
 
+
     // ===== Atualiza os campos =====
     genero.nome = nome || genero.nome;
     genero.classificacao = classificacao || genero.classificacao;
+    genero.status = status || genero.status;
 
     await genero.save();
 
@@ -76,26 +78,6 @@ exports.atualizarGenero = async (req, res) => {
     return res.status(500).json({ erro: "Erro interno ao atualizar gênero." });
   }
 };
-
-
-// ======= apagar genero do catalogo (ADMIN) ========
-
-exports.deletarGenero = async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    const genero = await Genero.findByPk(id);
-    if (!genero) {
-      return res.status(404).send("Gênero não encontrado.");
-    }
-    await genero.destroy();
-    return res.status(200).send("Gênero deletado com sucesso.");
-  } catch (error) {
-    console.error("Erro ao deletar gênero:", error);
-    return res.status(500).send("Erro ao deletar gênero.");
-  }
-};
-
 
 // ver generos com status ativos //
 

@@ -11,13 +11,12 @@ const { autenticar } = require("../service/token");
 
 const { permitir } = require("../service/permissao");
 
-// cliente // 
-router.get("/cliente/comprovante/:idVenda", autenticar, permitir("cliente"), comprovanteController.gerarComprovante); //cliente
+// todos //
+router.get("comprovante/:idVenda", autenticar, permitir("gestor", "cliente"), comprovanteController.gerarComprovante); 
 
 
-// gestor //
-router.get("/gestor/comprovante/:idVenda", autenticar, permitir("gestor"), comprovanteController.gerarComprovante); // gestor
-router.get("/gestor/comprovantes", autenticar, permitir("gestor"), comprovanteController.listarComprovantes); //gestor
+// gestor // 
+router.get("/comprovantes", autenticar, permitir("gestor"), comprovanteController.listarComprovantes); //gestor
 
 
 module.exports = router;

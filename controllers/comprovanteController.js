@@ -74,10 +74,14 @@ module.exports = {
 
       doc.end();
 
-      stream.on("finish", () => {
-        res.setHeader("Content-Type", "application/pdf");
-        res.sendFile(arquivoPDF);
-      });
+     stream.on("finish", () => {
+     res.setHeader("Content-Type", "application/pdf");
+
+     res.setHeader("Content-Disposition", "inline; filename=comprovante.pdf");
+
+     res.sendFile(arquivoPDF);
+   });
+
 
     } catch (erro) {
       console.error("Erro ao gerar comprovante:", erro);
