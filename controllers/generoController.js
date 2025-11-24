@@ -12,8 +12,14 @@ exports.adicionarGenero = async (req, res) => {
 
   console.log(req.body);
 
+<<<<<<< HEAD
   try {
     let { nome, classificacao } = req.body;
+=======
+        if (!nome || !classificacao) {
+            return res.status(400).send("Faltam campos obrigatorios.");
+        }
+>>>>>>> feature/Livya
 
     if (!nome || !classificacao) {
       return res.status(400).send("Faltam campos obrigatorios.");
