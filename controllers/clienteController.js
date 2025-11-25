@@ -109,6 +109,7 @@ exports.listarClientes = async (req, res) => {
 
     try {
 
+
         const lista = await models.clientes.findAll({
             attributes: ['idCliente', 'nome', 'cpf', 'email', 'senha'],
         });
