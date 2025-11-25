@@ -47,43 +47,116 @@ exports.realizarvenda = async (req, res) => {
   let t;
 
   try {
-    const { idCliente, idSessao, idSala, qtde, valorTotal } = req.body;
+    const { idCliente, idSessao, cadeiras } = req.body;
 
-    if (!idCliente || !idSessao || !idSala || !qtde || !valorTotal) {
-      return res
-        .status(400)
-        .json({ erro: "Dados incompletos para realizar a venda." });
+    if (!idCliente || !idSessao || !Array.isArray(cadeiras) || cadeiras.length === 0) {
+      return res.status(400).json({
+        erro: "Dados incompletos. Envie idCliente, idSessao e um array de cadeiras."
+      });
     }
+
+    const qtde = cadeiras.length;
 
     t = await sequelize.transaction();
 
+    // buscando sessão
     const sessao = await models.sessoes.findByPk(idSessao);
     if (!sessao) {
       await t.rollback();
       return res.status(404).json({ erro: "Sessão não encontrada." });
     }
 
-    if (sessao.assentosDisponiveis < qtde) {
+    const idSala = sessao.idSala; // Agora buscamos automaticamente pela sessão
+
+    // preço unitário
+    const salaTipo = await models.salasTipo.findByPk(sessao.idSalasTipo);
+    if (!salaTipo) {
       await t.rollback();
-      return res
-        .status(400)
-        .json({ erro: "Não há assentos disponíveis suficientes." });
+      return res.status(400).json({
+        erro: "Tipo de sala não encontrado."
+      });
     }
 
-    await verificarDisponibilidade([idSala], t);
+    const precoUnitario = Number(salaTipo.valor);
+    if (!precoUnitario || precoUnitario <= 0) {
+      await t.rollback();
+      return res.status(400).json({
+        erro: "SalasTipo não possui valor definido."
+      });
+    }
 
-    const novaVenda = await models.vendas.create(
+    // checar assentos disponíveis
+    if (sessao.assentosDisponiveis < qtde) {
+      await t.rollback();
+      return res.status(400).json({
+        erro: "Não há assentos suficientes na sessão."
+      });
+    }
+
+    // buscar cadeiras selecionadas
+    const cadeirasInfo = await models.salasCadeira.findAll({
+      where: { idSalasCadeira: cadeiras }
+    });
+
+    if (cadeirasInfo.length !== cadeiras.length) {
+      await t.rollback();
+      return res.status(400).json({
+        erro: "Uma ou mais cadeiras não existem."
+      });
+    }
+
+    // validação individual das cadeiras
+    for (const cadeira of cadeirasInfo) {
+
+      // cadeira precisa pertencer à sala da sessão
+      if (cadeira.idSala !== idSala) {
+        await t.rollback();
+        return res.status(400).json({
+          erro: `A cadeira ${cadeira.idSalasCadeira} não pertence à sala da sessão.`
+        });
+      }
+
+      // 0 = ocupadas
+      if (cadeira.status === 0) {
+        await t.rollback();
+        return res.status(400).json({
+          erro: `A cadeira ${cadeira.idSalasCadeira} já está ocupada.`
+        });
+      }
+    }
+
+    const valorTotal = precoUnitario * qtde;
+
+    // criar venda
+    const venda = await models.vendas.create(
       {
         idCliente,
         idSessao,
         idSala,
         qtde,
         valorTotal,
-        status: STATUS_PENDENTE,
+        status: 1
       },
       { transaction: t }
     );
 
+    // criar itens da venda + bloquear a cadeira
+    for (const cadeira of cadeirasInfo) {
+      await models.vendasItens.create(
+        {
+          idVenda: venda.idVenda,
+          idSalasCadeira: cadeira.idSalasCadeira,
+          precoUnitario,
+          status: 1
+        },
+        { transaction: t }
+      );
+
+      // atualiza status da cadeira → ocupada
+      await cadeira.update({ status: 0 }, { transaction: t });
+    }
+
+    // atualizar assentos disponíveis da sessão
     await sessao.update(
       { assentosDisponiveis: sessao.assentosDisponiveis - qtde },
       { transaction: t }
@@ -93,17 +166,22 @@ exports.realizarvenda = async (req, res) => {
 
     return res.status(201).json({
       mensagem: "Venda realizada com sucesso!",
-      venda: novaVenda,
+      venda,
+      precoUnitario,
+      valorTotal,
+      cadeirasEscolhidas: cadeiras
     });
+
   } catch (erroInterno) {
     if (t) await t.rollback();
     console.error("Erro ao registrar venda:", erroInterno);
     return res.status(500).json({
       erro: "Erro ao registrar venda.",
-      detalhes: erroInterno.message,
+      detalhes: erroInterno.message
     });
   }
 };
+
 
 
 
@@ -232,7 +310,53 @@ exports.listarvendas = async (req, res) => {
   console.log("Usuário logado:", req.user);
 
   try {
-    const vendas = await models.vendas.findAll();
+    const vendas = await models.vendas.findAll({
+      attributes: ['idVenda', 'valorTotal', 'qtde', 'status'],
+      include: [
+        {
+          model: models.vendasItens,
+          as: 'vendasItens',
+          include: [
+            {
+              model: models.salasCadeira,
+              as: 'idSalasCadeira_salasCadeira',
+              attributes: ['idSalasCadeira', 'fileira', 'coluna', 'numero'],
+              include: [
+                {
+                  model: models.salas,
+                  as: 'idSala_sala',
+                  attributes: ['idSala', 'numero']
+                }
+              ]
+            }
+          ]
+        },
+        {
+          model: models.sessoes,
+          as: 'idSessao_sesso',
+          attributes: ['idSessao', 'data', 'hora'],
+          include: [
+            {
+              model: models.salas,
+              as: 'idSala_sala',
+              attributes: ['idSala', 'numero']
+            },
+            {
+              model: models.salasTipo,
+              as: 'idSalasTipo_salasTipo',
+              attributes: ['idSalasTipo', 'tipo', 'valor']
+            }
+          ]
+        },
+        {
+          model: models.salas,
+          as: 'idSala_sala',
+          attributes: ['idSala', 'numero']
+        }
+      ],
+      order: [['idVenda', 'DESC']]
+    });
+
 
     res.json(vendas);
   } catch (error) {
