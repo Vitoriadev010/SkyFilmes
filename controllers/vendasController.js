@@ -314,6 +314,11 @@ exports.listarvendas = async (req, res) => {
       attributes: ['idVenda', 'valorTotal', 'qtde', 'status'],
       include: [
         {
+          model: models.clientes,
+          as: 'idCliente_cliente',
+          attributes: ['nome']
+        },
+        {
           model: models.vendasItens,
           as: 'vendasItens',
           include: [
