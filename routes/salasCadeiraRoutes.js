@@ -19,7 +19,6 @@ router.get("/listarcadeiras/:idSala", salasCadeiraController.listarCadeiraId); /
 
 
 // gestor // 
-router.post("/adicionarcadeira", autenticar, permitir("gestor"), salasCadeiraController.adicionarCadeira); // admin
 router.patch("/atualizarcadeira/:id", autenticar, permitir("gestor"), salasCadeiraController.atualizarCadeira); // admin
 
 

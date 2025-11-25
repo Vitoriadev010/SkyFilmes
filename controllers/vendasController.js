@@ -47,7 +47,16 @@ exports.realizarvenda = async (req, res) => {
   let t;
 
   try {
-    const { idCliente, idGestor, idSessao, cadeiras } = req.body;
+    const {  idSessao, cadeiras } = req.body;
+
+    const idCliente = req.user.idCliente || null;
+    const idGestor = req.user.idGestor || null;
+
+  if (!idSessao || !Array.isArray(cadeiras) || cadeiras.length === 0) {
+  return res.status(400).json({
+    erro: "Dados incompletos. Envie Sessao e cadeiras."
+  });
+}
 
 
     if ((idCliente && idGestor) || (!idCliente && !idGestor)) {
@@ -56,13 +65,6 @@ exports.realizarvenda = async (req, res) => {
   });
 }
 
-
-
-if (!idSessao || !Array.isArray(cadeiras) || cadeiras.length === 0) {
-  return res.status(400).json({
-    erro: "Dados incompletos. Envie Sessao e cadeiras."
-  });
-}
 
 
 if ((idCliente && idGestor) || (!idCliente && !idGestor)) {
@@ -81,7 +83,7 @@ if ((idCliente && idGestor) || (!idCliente && !idGestor)) {
       return res.status(404).json({ erro: "Sessão não encontrada." });
     }
 
-    const idSala = sessao.idSala; // Agora buscamos automaticamente pela sessão
+    const idSala = sessao.idSala; 
 
 
     const salaTipo = await models.salasTipo.findByPk(sessao.idSalasTipo);

@@ -89,8 +89,8 @@ exports.logarCliente = async (req, res) => {
 
         const token = jwt.sign(
             {
+                idCliente: userCliente.idCliente,
                 nome: userCliente.nome,
-                senha: userCliente.senha,
                 role: "cliente"
             },
             SECRET

@@ -5,24 +5,51 @@ const jwt = require("jsonwebtoken");
 
 const SECRET = "APIbilheteria";
 
-// ======== Adicionar sala (ADMIN) =========
+// ======== Adicionar sala + criar cadeiras automaticamente (ADMIN) =========
 exports.adicionarSala = async (req, res) => {
-
   try {
-    // CORRIGIDO: Removido 'idFilme' do corpo, pois não existe no model 'salas.js'
-    let {  numero } = req.body;
+    let { numero, fileiras, colunas } = req.body;
 
-    const novaSala = await models.salas.create({
-      numero
+    if (!numero || !fileiras || !colunas) {
+      return res.status(400).json({
+        erro: "Envie número da sala, quantidade de fileiras e colunas."
+      });
+    }
+
+    
+    const novaSala = await models.salas.create({ numero });
+
+  
+    const cadeiras = [];
+    const letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+    for (let f = 0; f < fileiras; f++) {
+      for (let c = 1; c <= colunas; c++) {
+        cadeiras.push({
+          idSala: novaSala.idSala,
+          fileira: letras[f],
+          coluna: c,
+          numero: `${letras[f]}${c}`,
+          status: 1
+        });
+      }
+    }
+
+    // Criando todas no banco
+    await models.salasCadeira.bulkCreate(cadeiras);
+
+    return res.status(201).json({
+      mensagem: "Sala criada com sucesso!",
+      sala: novaSala,
+      cadeirasCriadas: cadeiras.length
     });
 
-    return res.status(201).json(novaSala);
-
   } catch (error) {
-    console.error("erro ao adicionar nova sala:", error);
-    return res.status(500).json({ error: "erro ao adicionar nova sala!" });
+    console.error("Erro ao adicionar nova sala:", error);
+    return res.status(500).json({ error: "Erro ao adicionar nova sala!" });
   }
 };
+
 
 // ======= Listar salas (ADMIN) ==========
 exports.listarSalas = async (req, res) => {

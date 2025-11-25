@@ -89,8 +89,8 @@ exports.logarGestor = async (req, res) => {
 
         const token = jwt.sign(
             {
+                idGestor: userGestor.idGestor,
                 nome: userGestor.nome,
-                senha: userGestor.senha,
                 role: "gestor"
             },
             SECRET
