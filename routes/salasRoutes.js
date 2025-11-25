@@ -12,7 +12,7 @@ const { permitir } = require("../service/permissao");
 
 
 // todos //
-router.get("/:id", salasController.ListarSalaPorID); // todos
+router.get("/buscarsala/:id", salasController.ListarSalaPorID); // todos
 router.get("/listarsalas", salasController.listarSalas); // todos
 router.get("/salaativa", salasController.salasAtiva); // todos
 
