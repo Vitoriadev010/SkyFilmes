@@ -291,7 +291,7 @@ exports.sessoesPorFilme = async (req, res) => {
                 },
                 {
                     model: models.salas,
-                    as: 'ideSala_sala',
+                    as: 'idSala_sala',
                     attributes: [
                         'numero'
                     ]
