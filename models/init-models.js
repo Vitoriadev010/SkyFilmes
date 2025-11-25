@@ -32,12 +32,12 @@ function initModels(sequelize) {
   filmes.hasMany(sessoes, { as: "sessos", foreignKey: "idFilme"});
   filmes.belongsTo(generos, { as: "idGenero_genero", foreignKey: "idGenero"});
   generos.hasMany(filmes, { as: "filmes", foreignKey: "idGenero"});
-  salasCadeira.belongsTo(salas, { as: "ideSala_sala", foreignKey: "ideSala"});
-  salas.hasMany(salasCadeira, { as: "salasCadeiras", foreignKey: "ideSala"});
-  sessoes.belongsTo(salas, { as: "ideSala_sala", foreignKey: "ideSala"});
-  salas.hasMany(sessoes, { as: "sessos", foreignKey: "ideSala"});
-  vendas.belongsTo(salas, { as: "ideSala_sala", foreignKey: "ideSala"});
-  salas.hasMany(vendas, { as: "vendas", foreignKey: "ideSala"});
+  salasCadeira.belongsTo(salas, { as: "idSala_sala", foreignKey: "idSala"});
+  salas.hasMany(salasCadeira, { as: "salasCadeiras", foreignKey: "idSala"});
+  sessoes.belongsTo(salas, { as: "idSala_sala", foreignKey: "idSala"});
+  salas.hasMany(sessoes, { as: "sessos", foreignKey: "idSala"});
+  vendas.belongsTo(salas, { as: "idSala_sala", foreignKey: "idSala"});
+  salas.hasMany(vendas, { as: "vendas", foreignKey: "idSala"});
   vendasItens.belongsTo(salasCadeira, { as: "idSalasCadeira_salasCadeira", foreignKey: "idSalasCadeira"});
   salasCadeira.hasMany(vendasItens, { as: "vendasItens", foreignKey: "idSalasCadeira"});
   sessoes.belongsTo(salasTipo, { as: "idSalasTipo_salasTipo", foreignKey: "idSalasTipo"});

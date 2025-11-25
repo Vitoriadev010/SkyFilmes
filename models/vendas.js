@@ -15,12 +15,12 @@ module.exports = function(sequelize, DataTypes) {
         key: 'idCliente'
       }
     },
-    ideSala: {
+    idSala: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
         model: 'salas',
-        key: 'ideSala'
+        key: 'idSala'
       }
     },
     idSessao: {
@@ -65,17 +65,17 @@ module.exports = function(sequelize, DataTypes) {
         ]
       },
       {
-        name: "ideSala",
-        using: "BTREE",
-        fields: [
-          { name: "ideSala" },
-        ]
-      },
-      {
         name: "idSessao",
         using: "BTREE",
         fields: [
           { name: "idSessao" },
+        ]
+      },
+      {
+        name: "idSala",
+        using: "BTREE",
+        fields: [
+          { name: "idSala" },
         ]
       },
     ]

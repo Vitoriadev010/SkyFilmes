@@ -7,12 +7,12 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       primaryKey: true
     },
-    ideSala: {
+    idSala: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
         model: 'salas',
-        key: 'ideSala'
+        key: 'idSala'
       }
     },
     fileira: {
@@ -46,10 +46,10 @@ module.exports = function(sequelize, DataTypes) {
         ]
       },
       {
-        name: "ideSala",
+        name: "idSala",
         using: "BTREE",
         fields: [
-          { name: "ideSala" },
+          { name: "idSala" },
         ]
       },
     ]
