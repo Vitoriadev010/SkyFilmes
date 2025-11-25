@@ -45,7 +45,7 @@ exports.ListarSalaPorID = async (req, res) => {
     const { id } = req.params;
 
     const sala = await models.salas.findOne({
-      where: { ideSala: id },
+      where: { ideala: id },
       include: [
        
       ]
@@ -69,7 +69,7 @@ exports.atualizarSala = async (req, res) => {
 
   try {
     const { id } = req.params;
-    const { ideSala, numero, status } = req.body;
+    const { idSala, numero, status } = req.body;
 
 
     const sala = await models.salas.findByPk(id);

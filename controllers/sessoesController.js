@@ -13,14 +13,14 @@ exports.criarSessao = async (req, res) => {
     console.log("Usuário logado:", req.user);
 
     console.log('criando sessao');
-    const { idFilme, ideSala, idSalasTipo, hora, data } = req.body;
+    const { idFilme, idSala, idSalasTipo, hora, data } = req.body;
 
     try {
 
         const sessaoExistente = await models.sessoes.findOne({
             where: {
                 idFilme: idFilme,
-                ideSala: ideSala,
+                idSala: idSala,
                 hora: hora,
                 data: data
             }
@@ -36,7 +36,7 @@ exports.criarSessao = async (req, res) => {
 
         const novaSessao = await models.sessoes.create({
             idFilme: idFilme,
-            ideSala: ideSala,
+            idSala: idSala,
             idSalasTipo: idSalasTipo,
             hora: hora,
             data: data
@@ -71,7 +71,7 @@ exports.criarSessao = async (req, res) => {
                 },
                 {
                     model: models.salas,
-                    as: 'ideSala_sala',
+                    as: 'idSala_sala',
                     attributes: [
                         'numero'
                     ]
@@ -123,7 +123,7 @@ exports.criarSessao = async (req, res) => {
 exports.editarSessao = async (req, res) => {
     console.log("Usuário logado:", req.user);
 
-    const { idSessao, idFilme, ideSala, hora, data, status } = req.body;
+    const { idSessao, idFilme, idSala, hora, data, status } = req.body;
 
     try {
         // Busca a sessão pelo idSessao
@@ -135,7 +135,7 @@ exports.editarSessao = async (req, res) => {
 
         // Atualiza somente os campos que vieram
         if (idFilme !== undefined) sessao.idFilme = idFilme;
-        if (ideSala !== undefined) sessao.ideSala = ideSala;
+        if (idSala !== undefined) sessao.idSala = idSala;
         if (hora !== undefined) sessao.hora = hora;
         if (data !== undefined) sessao.data = data;
         if (status !== undefined) sessao.status = status;
@@ -184,7 +184,7 @@ exports.listarSessoes = async (req, res) => {
             }
         }
         const listaSessoes = await models.sessoes.findAll({
-            attributes: ['idSessao', 'idFilme', 'ideSala', 'hora', 'data', 'status'],
+            attributes: ['idSessao', 'idFilme', 'idSala', 'hora', 'data', 'status'],
             where
         });
 
@@ -216,7 +216,7 @@ exports.listarSessoesFuturas = async (req, res) => {
             ],
             include: [
                 'idFilme_filme',
-                'ideSala_sala'
+                'idSala_sala'
             ]
         });
 

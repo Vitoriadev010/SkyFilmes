@@ -47,9 +47,9 @@ exports.realizarvenda = async (req, res) => {
   let t;
 
   try {
-    const { idCliente, idSessao, ideSala, qtde, valorTotal } = req.body;
+    const { idCliente, idSessao, idSala, qtde, valorTotal } = req.body;
 
-    if (!idCliente || !idSessao || !ideSala || !qtde || !valorTotal) {
+    if (!idCliente || !idSessao || !idSala || !qtde || !valorTotal) {
       return res
         .status(400)
         .json({ erro: "Dados incompletos para realizar a venda." });
@@ -70,13 +70,13 @@ exports.realizarvenda = async (req, res) => {
         .json({ erro: "Não há assentos disponíveis suficientes." });
     }
 
-    await verificarDisponibilidade([ideSala], t);
+    await verificarDisponibilidade([idSala], t);
 
     const novaVenda = await models.vendas.create(
       {
         idCliente,
         idSessao,
-        ideSala,
+        idSala,
         qtde,
         valorTotal,
         status: STATUS_PENDENTE,
@@ -150,8 +150,8 @@ exports.vendasPorCLiente = async (req, res) => {
               include: [
                 {
                   model: models.salas,
-                  as: 'ideSala_sala',
-                  attributes: ['ideSala', 'numero']
+                  as: 'idSala_sala',
+                  attributes: ['idSala', 'numero']
                 }
               ]
             }
@@ -164,8 +164,8 @@ exports.vendasPorCLiente = async (req, res) => {
           include: [
             {
               model: models.salas,
-              as: 'ideSala_sala',
-              attributes: ['ideSala', 'numero']
+              as: 'idSala_sala',
+              attributes: ['idSala', 'numero']
             },
 
             {
@@ -179,8 +179,8 @@ exports.vendasPorCLiente = async (req, res) => {
         },
         {
           model: models.salas,
-          as: 'ideSala_sala',
-          attributes: ['ideSala', 'numero']
+          as: 'idSala_sala',
+          attributes: ['idSala', 'numero']
         }
       ],
       order: [['idVenda', 'DESC']]
@@ -196,14 +196,14 @@ exports.vendasPorCLiente = async (req, res) => {
       valorTotal: venda.valorTotal,
       qtde: venda.qtde,
       status: venda.status,
-      sala: venda.ideSala_sala ? venda.ideSala_sala.numero : null,
+      sala: venda.idSala_sala ? venda.idSala_sala.numero : null,
       sessao: venda.idSessao_sesso ? {
         idSessao: venda.idSessao_sesso.idSessao,
         data: venda.idSessao_sesso.data,
         hora: venda.idSessao_sesso.hora,
-        sala: venda.idSessao_sesso.ideSala_sala?.numero,
-        tipoSala: venda.idSessao_sesso.ideSala_sala?.idSalasTipo_salasTipo?.tipo,
-        valorIngresso: venda.idSessao_sesso.ideSala_sala?.idSalasTipo_salasTipo?.valor
+        sala: venda.idSessao_sesso.idSala_sala?.numero,
+        tipoSala: venda.idSessao_sesso.idSala_sala?.idSalasTipo_salasTipo?.tipo,
+        valorIngresso: venda.idSessao_sesso.idSala_sala?.idSalasTipo_salasTipo?.valor
       } : null,
       cadeiras: venda.vendasItens.map(item => ({
         id: item.idSalasCadeira_salasCadeira?.idSalasCadeira,

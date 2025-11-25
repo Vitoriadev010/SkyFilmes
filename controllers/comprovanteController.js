@@ -59,7 +59,7 @@ module.exports = {
       doc.fontSize(14).text(`Número da Venda: ${venda.idVenda}`);
       doc.text(`Cliente: ${venda.idCliente}`);
       doc.text(`Sessão: ${venda.idSessao}`);
-      doc.text(`Sala: ${venda.ideSala}`);
+      doc.text(`Sala: ${venda.idSala}`);
       doc.text(`Ingressos: ${venda.qtde}`);
       doc.text(`Valor Total: R$ ${venda.valorTotal}`);
       doc.text(`Status: Pago`);
