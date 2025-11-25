@@ -76,16 +76,6 @@ exports.criarSessao = async (req, res) => {
                         'numero'
                     ]
                 }, 
-                    
-                        {
-                            model: models.salasTipo,
-                            as: 'ideSala_salasTipo',
-                            attributes: [
-                                'tipo',
-                                'valor'
-                            ]
-
-                        },
                 {
                     model: models.salasTipo,
                     as: 'idSalasTipo_salasTipo',
