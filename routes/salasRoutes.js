@@ -18,7 +18,7 @@ router.get("/salaativa", salasController.salasAtiva); // todos
 
 
 // gestor 
-router.patch("/:id", autenticar, permitir("gestor"), salasController.atualizarSala); // admin
+router.patch("/atualizarsala/:id", autenticar, permitir("gestor"), salasController.atualizarSala); // admin
 router.post("/adicionarsala", autenticar, permitir("gestor"), salasController.adicionarSala); // admin
 
 
