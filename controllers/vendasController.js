@@ -47,19 +47,34 @@ exports.realizarvenda = async (req, res) => {
   let t;
 
   try {
-    const { idCliente, idSessao, cadeiras } = req.body;
+    const { idCliente, idGestor, idSessao, cadeiras } = req.body;
 
-    if (!idCliente || !idSessao || !Array.isArray(cadeiras) || cadeiras.length === 0) {
-      return res.status(400).json({
-        erro: "Dados incompletos. Envie idCliente, idSessao e um array de cadeiras."
-      });
-    }
+
+    if ((idCliente && idGestor) || (!idCliente && !idGestor)) {
+  return res.status(400).json({
+    erro: "Envie apenas Cliente ou Gestor. Nunca envie ambos e nunca deixe os dois vazios."
+  });
+}
+
+
+
+if (!idSessao || !Array.isArray(cadeiras) || cadeiras.length === 0) {
+  return res.status(400).json({
+    erro: "Dados incompletos. Envie Sessao e cadeiras."
+  });
+}
+
+
+if ((idCliente && idGestor) || (!idCliente && !idGestor)) {
+  return res.status(400).json({
+    erro: "Envie Cliente OU Gestor. Nunca ambos."
+  });
+}
 
     const qtde = cadeiras.length;
 
     t = await sequelize.transaction();
 
-    // buscando sessão
     const sessao = await models.sessoes.findByPk(idSessao);
     if (!sessao) {
       await t.rollback();
@@ -68,7 +83,7 @@ exports.realizarvenda = async (req, res) => {
 
     const idSala = sessao.idSala; // Agora buscamos automaticamente pela sessão
 
-    // preço unitário
+
     const salaTipo = await models.salasTipo.findByPk(sessao.idSalasTipo);
     if (!salaTipo) {
       await t.rollback();
@@ -85,7 +100,6 @@ exports.realizarvenda = async (req, res) => {
       });
     }
 
-    // checar assentos disponíveis
     if (sessao.assentosDisponiveis < qtde) {
       await t.rollback();
       return res.status(400).json({
@@ -93,7 +107,6 @@ exports.realizarvenda = async (req, res) => {
       });
     }
 
-    // buscar cadeiras selecionadas
     const cadeirasInfo = await models.salasCadeira.findAll({
       where: { idSalasCadeira: cadeiras }
     });
@@ -105,10 +118,10 @@ exports.realizarvenda = async (req, res) => {
       });
     }
 
-    // validação individual das cadeiras
+
     for (const cadeira of cadeirasInfo) {
 
-      // cadeira precisa pertencer à sala da sessão
+
       if (cadeira.idSala !== idSala) {
         await t.rollback();
         return res.status(400).json({
@@ -116,7 +129,6 @@ exports.realizarvenda = async (req, res) => {
         });
       }
 
-      // 0 = ocupadas
       if (cadeira.status === 0) {
         await t.rollback();
         return res.status(400).json({
@@ -130,7 +142,8 @@ exports.realizarvenda = async (req, res) => {
     // criar venda
     const venda = await models.vendas.create(
       {
-        idCliente,
+       idCliente: idCliente || null,
+       idGestor: idGestor || null,
         idSessao,
         idSala,
         qtde,
@@ -140,7 +153,6 @@ exports.realizarvenda = async (req, res) => {
       { transaction: t }
     );
 
-    // criar itens da venda + bloquear a cadeira
     for (const cadeira of cadeirasInfo) {
       await models.vendasItens.create(
         {
@@ -152,11 +164,9 @@ exports.realizarvenda = async (req, res) => {
         { transaction: t }
       );
 
-      // atualiza status da cadeira → ocupada
       await cadeira.update({ status: 0 }, { transaction: t });
     }
 
-    // atualizar assentos disponíveis da sessão
     await sessao.update(
       { assentosDisponiveis: sessao.assentosDisponiveis - qtde },
       { transaction: t }
