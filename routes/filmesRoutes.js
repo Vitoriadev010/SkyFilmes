@@ -18,7 +18,7 @@ router.get("/listarfilmes", filmesController.listarFilmes); // todos
 router.get("/listasfilmesembreve", filmesController.filmesEmBreve); // todos 
 router.get("/cartaz", filmesController.listarStatusCartaz); // todos
 router.get("/:titulo", filmesController.buscarFilme); //todos
-router.get("/:idGenero", filmesController.listargenerosFilmes); // todos
+router.get("/listarPorGenero/:idGenero", filmesController.listargenerosFilmes); // todos
 router.get("/selecionarIdioma/:idioma", filmesController.selecionarIdioma); // todos
 
 

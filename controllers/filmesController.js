@@ -105,6 +105,7 @@ exports.listarFilmes = async (req, res) => {
 
 
 // listar filmes por status //
+
 // status situação: 1 - cartaz; 2 - em breve; 3- desativo
 
 exports.listarStatusCartaz = async (req, res) => {
@@ -268,9 +269,10 @@ exports.buscarFilme = async (req, res) => {
 
   try {
 
-    const filme = await filme.findOne({
+    const filme = await models.filmes.findOne({
       where: { titulo },
-      include: [{ model: Genero, as: "idGenero_genero", attributes: ["nome"] }]
+      
+      include: [{ model: models.generos, as: "idGenero_genero", attributes: ["nome"] }]
     });
 
     if (!filme) {
