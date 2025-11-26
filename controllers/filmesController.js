@@ -287,13 +287,20 @@ exports.buscarFilme = async (req, res) => {
 // ======= Listar filmes por gênero (TODOS) =======
 
 exports.listargenerosFilmes = async (req, res) => {
-  const { id_genero } = req.params;
+  const { idGenero } = req.params;
 
   try {
 
     const filmes = await models.filmes.findAll({
-      where: { id_genero },
-      include: [{ model: Genero, as: "idGenero_genero", attributes: ["nome"] }]
+      where: { idGenero },
+      attributes: ['titulo', 'sinopse', 'duracao', 'capa', 'trailler', 'idioma'],
+      include: [
+        { 
+          model: models.generos, 
+          as: "idGenero_genero", 
+          attributes: ["nome"] 
+        }
+      ]
     });
 
     if (filmes.length === 0) {
