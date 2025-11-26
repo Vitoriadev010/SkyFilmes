@@ -13,21 +13,14 @@ const { permitir } = require("../service/permissao");
 
 
 
-// gestor // 
-router.patch("/:id", autenticar, permitir("gestor"), filmesController.atualizarFilme); // admin
-router.post("/adicionarfilme", autenticar, permitir("gestor"), filmesController.adicionarFilme); // admin
-router.post("/criarSessaoEmBreve", autenticar, permitir("gestor"), filmesController.criarSessaoEmBreve); //admin
-
 // todos //
 router.get("/listarfilmes", filmesController.listarFilmes); // todos
 router.get("/listasfilmesembreve", filmesController.filmesEmBreve); // todos 
 router.get("/cartaz", filmesController.listarStatusCartaz); // todos
-router.get("/filme/:titulo", filmesController.buscarFilme); //todos
-router.get("/filme/:id_genero", filmesController.listargenerosFilmes); // todos
+router.get("/:titulo", filmesController.buscarFilme); //todos
+router.get("/:idGenero", filmesController.listargenerosFilmes); // todos
 router.get("/selecionarIdioma/:idioma", filmesController.selecionarIdioma); // todos
-router.get("/filme/:titulo", filmesController.buscarFilme); //todos
-router.get("/filme/:id_genero", filmesController.listargenerosFilmes); // todos
-router.get("/selecionarIdioma/:idioma", filmesController.selecionarIdioma); // todos
+
 
 
 
